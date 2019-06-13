@@ -2,11 +2,11 @@
   "Ropsten": {
     "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
     "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
-    "KyberReserve": "0x76a2191d4f14bf05461351c81d90a784256fe1a6",
-    "LiquidityConversionRates": "0x4E58C621C8a49d35Ebf015f25c6f8359d55Cf5DF",
+    "KyberReserve": "0xf6dc5fc038bccf886a402a651ebe458b5b31597d",
+    "LiquidityConversionRates": "0x450127910ef81f450ec5c07ea61897bb92b73076",
     "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
     "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6",
-    "MYB": "0xc68d7c356e1b725f75cbaf1306a2603abd7157ca"
+    "TestToken": "0x013ae307648f529aa72c5767a334ddd37aab43c3"
   },
   "Mainnet": {
     "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
