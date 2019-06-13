@@ -1,0 +1,18 @@
+{
+  "Ropsten": {
+    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
+    "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
+    "KyberReserve": "0x76a2191d4f14bf05461351c81d90a784256fe1a6",
+    "LiquidityConversionRates": "0x4E58C621C8a49d35Ebf015f25c6f8359d55Cf5DF",
+    "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6",
+    "MYB": "0xc68d7c356e1b725f75cbaf1306a2603abd7157ca"
+  },
+  "Mainnet": {
+    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
+    "KyberNetwork": "0x9ae49C0d7F8F9EF4B864e004FE86Ac8294E20950",
+    "FeeBurner": "0x52166528FCC12681aF996e409Ee3a421a4e128A3",
+    "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "KNC": "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"
+  }
+}
