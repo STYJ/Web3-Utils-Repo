@@ -44,7 +44,7 @@ function tx(result, call) {
   console.log();
 }
 
-async function main() {
+async function testLCRSetup() {
   let rate_1;
   let rate_2;
 
@@ -74,4 +74,4 @@ async function main() {
 }
 
 // Start the script
-main();
+testLCRSetup();
