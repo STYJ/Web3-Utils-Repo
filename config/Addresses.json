@@ -2,15 +2,14 @@
   "Ropsten": {
     "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
     "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
-    "KyberReserve": "0xf6dc5fc038bccf886a402a651ebe458b5b31597d",
-    "LiquidityConversionRates": "0x450127910ef81f450ec5c07ea61897bb92b73076",
     "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6",
-    "TestToken": "0x013ae307648f529aa72c5767a334ddd37aab43c3"
+    "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6"
   },
   "Mainnet": {
     "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
     "KyberNetwork": "0x9ae49C0d7F8F9EF4B864e004FE86Ac8294E20950",
+    "KyberNetworkProxyStaging": "0xc14f34233071543e979f6a79aa272b0ab1b4947d",
+    "KyberNetworkStaging": "0x65897aDCBa42dcCA5DD162c647b1cC3E31238490",
     "FeeBurner": "0x52166528FCC12681aF996e409Ee3a421a4e128A3",
     "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
     "KNC": "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"

@@ -15,21 +15,16 @@ const provider = new HDWalletProvider(mnemonic, infura_ropsten_url, 0, 10);
 const web3 = new Web3(provider);
 const { addresses, wallets } = provider;
 
-// Retrieve config addresses
+// Retrieve config addresses, abis and test details
 const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
+const config_test_details = JSON.parse(fs.readFileSync('./config/TestDetails.json', 'utf8'));
 
-// Get instance of Ropsten KyberReserve for
-const KyberReserveABI = config_abis.KyberReserve;
-const RopstenKyberReserveAddress = config_addresses.Ropsten.KyberReserve;
-const RopstenKyberReserveInstance = new web3.eth.Contract(KyberReserveABI, RopstenKyberReserveAddress);
-
+// Ropsten Eth and KNC token addresses
 const ropsten_eth_address = config_addresses.Ropsten.ETH;
 const ropsten_knc_address = config_addresses.Ropsten.KNC;
-const ropsten_test_token_address = config_addresses.Ropsten.TestToken;
-const liquidity_rate = 0.00577;
-const test_token = "SNX"
 
+// Helper functions
 function stdlog(input) {
   console.log(`${moment().format('YYYY-MM-DD HH:mm:ss.SSS')}] ${input}`);
 }
@@ -44,31 +39,49 @@ function tx(result, call) {
   console.log();
 }
 
+function getLCRSetupDetails() {
+  return {
+    token_symbol: config_test_details.TestingLCRSetup.TokenSymbol,
+    token_address: config_test_details.TestingLCRSetup.TokenAddress,
+    liquidity_rate: config_test_details.TestingLCRSetup.LiquidityRate,
+    kyber_reserve_abi: config_abis.KyberReserve,
+    kyber_reserve_address: config_test_details.TestingLCRSetup.KyberReserveAddress,
+  };
+}
+
+//  Test that liquidity conversion rate has been setup correct
 async function testLCRSetup() {
+  // Getting test details
+  let testDetails = getLCRSetupDetails();
+
+  // Get instance of Kyber Reserve
+  const kyber_reserve_instance = new web3.eth.Contract(testDetails.kyber_reserve_abi, testDetails.kyber_reserve_address);
+
+  // Perform the actual testing
   let rate_1;
   let rate_2;
 
   stdlog('- START -');
-  stdlog(`${test_token} Ropsten Reserve: ${RopstenKyberReserveAddress}`);
-  stdlog(`Running getConversionRate(ETH, ${test_token}) for 1 Eth and 2 Eth worth`);
-  ( rate_1 = await RopstenKyberReserveInstance.methods.getConversionRate(
+  stdlog(`${testDetails.token_symbol} Ropsten Reserve: ${testDetails.kyber_reserve_address}`);
+  stdlog(`Running getConversionRate(ETH, ${testDetails.token_symbol}) for 1 Eth and 2 Eth worth`);
+  ( rate_1 = await kyber_reserve_instance.methods.getConversionRate(
     ropsten_eth_address, // srctoken
-    ropsten_test_token_address, // dstToken
+    testDetails.token_address, // dstToken
     web3.utils.toWei('1'), // srcQty
     0, // blockNumber
   ).call());
 
-  ( rate_2 = await RopstenKyberReserveInstance.methods.getConversionRate(
+  ( rate_2 = await kyber_reserve_instance.methods.getConversionRate(
     ropsten_eth_address, // srctoken
-    ropsten_test_token_address, // dstToken
+    testDetails.token_address, // dstToken
     web3.utils.toWei('2'), // srcQty
     0, // blockNumber
   ).call());
 
-  stdlog(`For 1 ETH, 1 ${test_token} = ${1/rate_1} ETH`);
-  stdlog(`For 2 ETH, 1 ${test_token} = ${1/rate_2} ETH`);
+  stdlog(`For 1 ETH, 1 ${testDetails.token_symbol} = ${1/rate_1} ETH`);
+  stdlog(`For 2 ETH, 1 ${testDetails.token_symbol} = ${1/rate_2} ETH`);
   stdlog(`Observed Rate change = ${((1/rate_2) - (1/rate_1))/(1/rate_1)}`);
-  stdlog(`Expected Rate change = ${liquidity_rate/2}`);
+  stdlog(`Expected Rate change = ${testDetails.liquidity_rate/2}`);
 
   stdlog('- END -');
 }
