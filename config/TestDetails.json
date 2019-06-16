@@ -5,5 +5,9 @@
     "TokenSymbol": "SNX",
     "TokenAddress": "0x013ae307648f529aa72c5767a334ddd37aab43c3",
     "LiquidityRate": 0.00577
+  },
+  "GetOrderbookReserveLimits" : {
+    "AbyssOrderbookReserveAddress": "0x1C802020Eea688E2B05936CDb98b8E6894ACC1c2",
+    "WaxOrderbookReserveAddress": "0x75ff6bec6ed398fa80ea1596cef422d64681f057"
   }
 }
