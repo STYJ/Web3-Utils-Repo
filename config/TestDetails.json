@@ -1,12 +1,12 @@
 {
-  "TestingLCRSetup": {
+  "LCRSetup": {
     "KyberReserveAddress": "0xf6dc5fc038bccf886a402a651ebe458b5b31597d",
     "LiquidityConversionRatesAddress": "0x450127910ef81f450ec5c07ea61897bb92b73076",
     "TokenSymbol": "SNX",
     "TokenAddress": "0x013ae307648f529aa72c5767a334ddd37aab43c3",
     "LiquidityRate": 0.00577
   },
-  "GetOrderbookReserveLimits" : {
+  "OrderbookReserveLimits" : {
     "AbyssOrderbookReserveAddress": "0x1C802020Eea688E2B05936CDb98b8E6894ACC1c2",
     "WaxOrderbookReserveAddress": "0x75ff6bec6ed398fa80ea1596cef422d64681f057"
   }

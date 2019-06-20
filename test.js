@@ -12,58 +12,82 @@ const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
 const config_test_details = JSON.parse(fs.readFileSync('./config/TestDetails.json', 'utf8'));
 
+const network = "ropsten";
+
 // Connecting to ropsten infura node
-const project_id = process.env.PROJECT_ID; //Replace this with your own Project ID
-// const infura_ropsten_url = "https://ropsten.infura.io/v3/" + project_id;
-const infura_mainnet_url = "https://mainnet.infura.io/v3/" + project_id;
-const mnemonic = process.env.MNEMONIC;
-const provider = new HDWalletProvider(mnemonic, infura_mainnet_url, 0, 10);
-const web3 = new Web3(provider);
 const {
   addresses,
-  wallets
-} = provider;
+  wallets,
+  web3
+} = connect(network);
 
-// Ropsten Eth and KNC token addresses
-// const ropsten_eth_address = config_addresses.Ropsten.ETH;
-// const ropsten_knc_address = config_addresses.Ropsten.KNC;
+// Eth and KNC addresses
+const eth_address = network == "ropsten" ? config_addresses.Ropsten.ETH : config_addresses.Mainnet.ETH;
+const knc_address = network == "ropsten" ? config_addresses.Ropsten.KNC : config_addresses.Mainnet.KNC;
 
-// Mainnet Eth and KNC token addresses
-const mainnet_eth_address = config_addresses.Mainnet.ETH;
-const mainnet_knc_address = config_addresses.Mainnet.KNC;
-
-// Helper functions
-function stdlog(input) {
-  console.log(`${moment().format('YYYY-MM-DD HH:mm:ss.SSS')}] ${input}`);
+async function main() {
+  // Call your function here.
+  testLCRSetup();
 }
 
-function tx(result, call) {
-  const logs = (result.logs.length > 0) ? result.logs[0] : {
-    address: null,
-    event: null
+main();
+
+/********************
+ * HELPER FUNCTIONS *
+ ********************/
+
+ // Print input
+ function stdlog(input) {
+   console.log(`[${moment().format('YYYY-MM-DD HH:mm:ss.SSS')}] ${input}`);
+ }
+
+ // Print txn result
+ function tx(result, call) {
+   const logs = (result.logs.length > 0) ? result.logs[0] : {
+     address: null,
+     event: null
+   };
+   console.log();
+   console.log(`   ${call}`);
+   console.log('   ------------------------');
+   console.log(`   > transaction hash: ${result.transactionHash}`);
+   console.log(`   > gas used: ${result.gasUsed}`);
+   console.log();
+ }
+
+// Connect to either Ropsten or Mainnet
+function connect(network) {
+  const project_id = process.env.PROJECT_ID; //Replace this with your own Project ID
+  const infura_url = network == "ropsten" ? "https://ropsten.infura.io/v3/" + project_id : "https://mainnet.infura.io/v3/" + project_id;
+  const mnemonic = process.env.MNEMONIC;
+  const provider = new HDWalletProvider(mnemonic, infura_url, 0, 10);
+  const web3 = new Web3(provider);
+  const {
+    addresses,
+    wallets
+  } = provider;
+  return {
+    addresses: addresses,
+    wallets: wallets,
+    web3: web3,
   };
-  console.log();
-  console.log(`   ${call}`);
-  console.log('   ------------------------');
-  console.log(`   > transaction hash: ${result.transactionHash}`);
-  console.log(`   > gas used: ${result.gasUsed}`);
-  console.log();
 }
+
 
 function getLCRSetupDetails() {
   return {
-    token_symbol: config_test_details.TestingLCRSetup.TokenSymbol,
-    token_address: config_test_details.TestingLCRSetup.TokenAddress,
-    liquidity_rate: config_test_details.TestingLCRSetup.LiquidityRate,
+    token_symbol: config_test_details.LCRSetup.TokenSymbol,
+    token_address: config_test_details.LCRSetup.TokenAddress,
+    liquidity_rate: config_test_details.LCRSetup.LiquidityRate,
     kyber_reserve_abi: config_abis.KyberReserve,
-    kyber_reserve_address: config_test_details.TestingLCRSetup.KyberReserveAddress,
+    kyber_reserve_address: config_test_details.LCRSetup.KyberReserveAddress,
   };
 }
 
 function getOrderbookDetails() {
   return {
-    abyss_orderbook_reserve_address: config_test_details.GetOrderbookReserveLimits.AbyssOrderbookReserveAddress,
-    wax_orderbook_reserve_address: config_test_details.GetOrderbookReserveLimits.WaxOrderbookReserveAddress,
+    abyss_orderbook_reserve_address: config_test_details.OrderbookReserveLimits.AbyssOrderbookReserveAddress,
+    wax_orderbook_reserve_address: config_test_details.OrderbookReserveLimits.WaxOrderbookReserveAddress,
     orderbook_reserve_abi: config_abis.OrderbookReserve
   };
 }
@@ -117,14 +141,14 @@ async function testLCRSetup() {
   stdlog(`${testDetails.token_symbol} Ropsten Reserve: ${testDetails.kyber_reserve_address}`);
   stdlog(`Running getConversionRate(ETH, ${testDetails.token_symbol}) for 1 Eth and 2 Eth worth`);
   (rate_1 = await kyber_reserve_instance.methods.getConversionRate(
-    ropsten_eth_address, // srctoken
+    eth_address, // srctoken
     testDetails.token_address, // dstToken
     web3.utils.toWei('1'), // srcQty
     0, // blockNumber
   ).call());
 
   (rate_2 = await kyber_reserve_instance.methods.getConversionRate(
-    ropsten_eth_address, // srctoken
+    eth_address, // srctoken
     testDetails.token_address, // dstToken
     web3.utils.toWei('2'), // srcQty
     0, // blockNumber
@@ -136,7 +160,3 @@ async function testLCRSetup() {
   stdlog(`Expected Rate change = ${testDetails.liquidity_rate/2}`);
   stdlog('- END -');
 }
-
-// Start the script
-// testLCRSetup();
-getOrderbookReserveLimits()
