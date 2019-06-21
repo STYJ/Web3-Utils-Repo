@@ -1,17 +1,34 @@
 {
-  "Ropsten": {
-    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
-    "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
-    "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "KNC": "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6"
+  "Kovan": {
+    "FeeBurner": "0x0E49481279407295A2555b89D5e6C699b94621e0",
+    "KyberNetwork": "0x118A7b23B7a2e6A57963d017A7E76A4E2636F075",
+    "KyberNetworkProxy": "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D",
+    "PermissionlessOrderbookReserveLister": "0x7dE123798f649c9937A75a0f6668E4d06bFf5993",
   },
+
   "Mainnet": {
-    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
-    "KyberNetwork": "0x9ae49C0d7F8F9EF4B864e004FE86Ac8294E20950",
-    "KyberNetworkProxyStaging": "0xc14f34233071543e979f6a79aa272b0ab1b4947d",
-    "KyberNetworkStaging": "0x65897aDCBa42dcCA5DD162c647b1cC3E31238490",
     "FeeBurner": "0x52166528FCC12681aF996e409Ee3a421a4e128A3",
-    "ETH": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    "KNC": "0xdd974d5c2e2928dea5f71b9825b8b646686bd200"
+    "KyberNetwork": "0x9ae49C0d7F8F9EF4B864e004FE86Ac8294E20950",
+    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
+    "PermissionlessOrderbookReserveLister": "0x84afa106fbf9b45e369724024cae14e8c7529c26",
+  },
+
+  "Rinkeby": {
+    "FeeBurner": "0xee2D191AD9273f5A8c448Fa209164f6DF97fC872",
+    "KyberNetwork": "0x55E7630f4fc1A96bAECB4fE9Ad3C7E9401B55E82",
+    "KyberNetworkProxy": "0xF77eC7Ed5f5B9a5aee4cfa6FFCaC6A4C315BaC76",
+    "PermissionlessOrderbookReserveLister": "0x748b5b4828F2003111B2138fBf9955A8821c0Ad3",
+  },
+
+  "Ropsten": {
+    "FeeBurner": "0x81ae4dE9A3Aec67a35C05c889052260E39BC42a4",
+    "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
+    "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
+    "PermissionlessOrderbookReserveLister": "0x405a5fae110c86eb2e5a76809a17fc5bee2d3ccd",
+  },
+
+  "Staging": {
+    "KyberNetwork": "0x65897aDCBa42dcCA5DD162c647b1cC3E31238490",
+    "KyberNetworkProxy": "0xc14f34233071543e979f6a79aa272b0ab1b4947d",
   }
 }

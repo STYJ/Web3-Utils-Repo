@@ -57,7 +57,7 @@ main();
 
 // Connect to either Ropsten or Mainnet
 function connect(network) {
-  const project_id = process.env.PROJECT_ID; //Replace this with your own Project ID
+  const project_id = process.env.INFURA_PROJECT_ID; //Replace this with your own Project ID
   const infura_url = network == "ropsten" ? "https://ropsten.infura.io/v3/" + project_id : "https://mainnet.infura.io/v3/" + project_id;
   const mnemonic = process.env.MNEMONIC;
   const provider = new HDWalletProvider(mnemonic, infura_url, 0, 10);
