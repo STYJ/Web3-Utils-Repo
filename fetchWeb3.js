@@ -7,6 +7,7 @@ process.on('unhandledRejection', console.error.bind(console));
 
 module.exports = {
   connect: function(network) {
+    if (network == 'staging') { network = 'mainnet' }
     const project_id = process.env.INFURA_PROJECT_ID;
     const infura_url = network + ".infura.io/v3/" + project_id;
     const mnemonic = process.env.MNEMONIC;

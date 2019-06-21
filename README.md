@@ -12,9 +12,9 @@ MNEMONIC=parrot consider guilt grit pull next bundle flat pepper over number rai
 ## Scripts
 ### Get Token Info
 ```
-const getTokenInfo = require("./getTokenInfo.js");
+import { getTokenInfo } from "./getTokenInfo.js";
 const NETWORK = "ropsten"
-await getTokenInfo.getTokenInfo(NETWORK,false,["BAT","MYB"]);
+await getTokenInfo(NETWORK,false,["BAT","MYB"]);
 ```
 
 ## JSON Structure
