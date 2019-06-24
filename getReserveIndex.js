@@ -20,8 +20,8 @@ async function main() {
     for (j=0;j<RESERVES_INDEXES_TO_FETCH.length;j++) {
       reserveAddress = RESERVES_INDEXES_TO_FETCH[j];
       if (reserves[i].toLowerCase() == reserveAddress) {
-        stdLog("Reserve address: " + reserveAddress);
-        stdLog("Reserve index: " + i);
+        stdLog(`Reserve address: ${reserveAddress}`);
+        stdLog(`Reserve index: ${i}`);
       }
     }
   }
