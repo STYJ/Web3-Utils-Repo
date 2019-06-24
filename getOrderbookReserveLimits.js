@@ -39,7 +39,7 @@ async function main() {
       orderListFactory
     } = await orderbookInstance.methods.contracts().call()
     );
-    stdLog(`token: ${token}`);
+    stdLog(`Reserve token: ${token}`);
     stdLog(`feeBurner: ${feeBurner}`);
     stdLog(`kyberNetwork: ${kyberNetwork}`);
     stdLog('------------------------------');
