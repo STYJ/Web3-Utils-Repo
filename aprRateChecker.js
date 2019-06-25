@@ -42,6 +42,8 @@ async function main() {
     web3.utils.toWei('1'), // srcQty
   ).call();
 
+  checkRateIsZero(rate1, 'pricing');
+
   rate2 = await pricingInstance.methods.getRate(
     tokenAddress, // conversionToken
     0, // currentBlockNumber
@@ -65,6 +67,8 @@ async function main() {
     0, // blockNumber
   ).call()
 
+  checkRateIsZero(rate1, 'reserve');
+
   rate2 = await reserveInstance.methods.getConversionRate(
     ETH_ADDRESS, // srcToken
     tokenAddress, // destToken
@@ -80,6 +84,15 @@ async function main() {
   process.exit(0);
 }
 
+function checkRateIsZero(rate, contractName) {
+  if (rate == 0) {
+    stdLog(`Rate returned from ${contractName} contract is zero.`);
+    process.exit(0);
+  } else {
+    stdLog(`${contractName} contract returning rate, OK!`);
+  }
+}
+
 function verifyInitialPrice(rate1,rate2,contractName) {
   rateDiffInPercent = (rate1 - config_params.initial_price) / config_params.initial_price * 100;
   //Check that initial price is within acceptable bounds
@@ -90,7 +103,7 @@ function verifyInitialPrice(rate1,rate2,contractName) {
   };
 }
 
-function verifyPriceMovement(rate1,rate2,contractName) {
+const verifyPriceMovement = function(rate1,rate2,contractName) {
   rateDiffInPercent = (rate2 - rate1) / rate1;
   if(Math.abs(rateDiffInPercent - (config_params.liquidity_rate / 2)) > 0.0001) {
     stdLog(`Error: Price movement in ${contractName} contract off from desired.`);
