@@ -10,7 +10,26 @@ MNEMONIC=parrot consider guilt grit pull next bundle flat pepper over number rai
 ```
 
 ## Scripts
-### Get Token Info
+### `aprRateChecker.js` - APR Rate Checker
+Checks that initial price and movement is as determined in liquidity params for the APR.
+1) Modify `liquidity_input_params.json` to match the settings used for the python script
+2) Run `aprRateChecker.js`
+
+### `checkReserveRatesOnKN.js` - Check Reserve Rates On Kyber Network (Ropsten / Staging)
+Checks that the rate set by the reserve can be seen in kyber network proxy, after addition to the network
+
+### `getOrderbookReserveLimits.js` - Get Orderbook Reserve Limits
+Obtain the following information for an orderbook reserve:
+1. `minNewOrderUsd`
+2. `maxOrdersPerTrade`
+3. `minNewOrderSizeWei`
+4. `minOrderSizeWei`
+5. Reserve token
+6. Fee burner contract address
+7. Kyber Network address
+
+### `getTokenInfo.js` - Get Token Info
+Useful for use in other scripts
 ```
 import { getTokenInfo } from "./getTokenInfo.js";
 const NETWORK = "ropsten"
