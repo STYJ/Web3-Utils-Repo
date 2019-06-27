@@ -7,9 +7,9 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "rinkeby"
-AUTOMATED_RESERVE_ADDRESS = "0x26F25E6A5c511Bb45bA959dA7D5236496dD6bd26"
-TOKEN_ADDRESS = "0xadb038ec6c52d7dd74519cec53a840e1b8bf12ae"
+NETWORK = "staging"
+AUTOMATED_RESERVE_ADDRESS = "0x1833AD67362249823515B59A8aA8b4f6B4358d1B"
+TOKEN_ADDRESS = "0x5d60d8d7ef6d37e16ebabc324de3be57f135e0bc"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -23,7 +23,7 @@ async function main() {
   kyberProxyInstance = new web3.eth.Contract(kyber_network_proxy_ABI, kyber_proxy_address);
   reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,AUTOMATED_RESERVE_ADDRESS);
 
-  const { kyberExpectedRate,kyberSlippageRate } = await kyberProxyInstance.methods.getExpectedRate(
+  const { expectedRate,slippageRate } = await kyberProxyInstance.methods.getExpectedRate(
     ETH_ADDRESS, // srcToken
     TOKEN_ADDRESS, // destToken
     web3.utils.toWei('1') // srcQty
@@ -37,16 +37,16 @@ async function main() {
   ).call();
 
   checkRateIsZero(reserveRate,'reserve');
-  checkRateIsZero(kyberExpectedRate,'proxy');
+  checkRateIsZero(expectedRate,'proxy');
 
-  if (kyberExpectedRate > reserveRate) {
+  if (expectedRate > reserveRate) {
     stdLog(`Error: Rate not from desired reserve. Please disable other reserves offering this token pair.`);
-    stdLog(`Proxy Rate: ${kyberExpectedRate}`);
+    stdLog(`Proxy Rate: ${expectedRate}`);
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
-  } else if (kyberExpectedRate < reserveRate) {
+  } else if (expectedRate < reserveRate) {
     stdLog(`Error: Reserve not added into network. Please do so, and disable other reserves`);
-    stdLog(`Proxy Rate: ${kyberExpectedRate}`);
+    stdLog(`Proxy Rate: ${expectedRate}`);
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
   } else {
@@ -57,7 +57,8 @@ async function main() {
 
 function checkRateIsZero(rate, contractName) {
   if (rate == 0) {
-    stdLog(`Rate returned from ${contractName} contract is zero.`)
+    stdLog(`Error: Rate returned from ${contractName} contract is zero.`);
+    stdLog(`Check if reserve is added into network.`);
     process.exit(0);
   } else {
     stdLog(`${contractName} contract returning rate, OK!`);
