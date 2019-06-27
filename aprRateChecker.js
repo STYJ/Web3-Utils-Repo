@@ -6,9 +6,9 @@ const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "ropsten"
-AUTOMATED_RESERVE_ADDRESS = "0xb1e779395446b4857232e7b8f84362a611c5669b"
-TOKEN_SYMBOL = "sUSD"
+NETWORK = "rinkeby"
+AUTOMATED_RESERVE_ADDRESS = "0x26F25E6A5c511Bb45bA959dA7D5236496dD6bd26"
+TOKEN_SYMBOL = "TRAC"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -97,7 +97,9 @@ function verifyInitialPrice(rate1,rate2,contractName) {
   rateDiffInPercent = (rate1 - config_params.initial_price) / config_params.initial_price * 100;
   //Check that initial price is within acceptable bounds
   if(Math.abs(rateDiffInPercent - config_params.fee_percent) > 0.5) {
-    stdLog(`Error: Initial price in ${contractName} contract too far off from desired by ${rateDiffInPercent - config_params.fee_percent}`)
+    stdLog(`Error: Initial price in ${contractName} contract off from desired by ${rateDiffInPercent - config_params.fee_percent}`);
+    stdLog(`Expected Price: ${config_params.initial_price}`);
+    stdLog(`Actual Price: ${ rate1 }`);
   } else {
     stdLog(`Initial price in ${contractName} contract OK!`)
   };

@@ -18,6 +18,9 @@ Checks that initial price and movement is as determined in liquidity params for 
 ### `checkReserveRatesOnKN.js` - Check Reserve Rates On Kyber Network (Ropsten / Staging)
 Checks that the rate set by the reserve can be seen in kyber network proxy, after addition to the network
 
+### `get_liquidity_params.py` - Get liquidity params
+`python3 get_liquidity_params.py --input ./config/liquidity_input_params.json --get params`
+
 ### `getOrderbookReserveLimits.js` - Get Orderbook Reserve Limits
 Obtain the following information for an orderbook reserve:
 1. `minNewOrderUsd`
