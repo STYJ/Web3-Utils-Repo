@@ -10,6 +10,10 @@ MNEMONIC=parrot consider guilt grit pull next bundle flat pepper over number rai
 ```
 
 ## Scripts
+### `aprPriceDebugger.js` - APR Rate Debugger
+Should the price for the APR reserve be zero, this script can be run to try to figure out why.
+Checks for both pricing and reserve contract.
+
 ### `aprRateChecker.js` - APR Rate Checker
 Checks that initial price and movement is as determined in liquidity params for the APR.
 1) Modify `liquidity_input_params.json` to match the settings used for the python script

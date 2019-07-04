@@ -50,9 +50,33 @@ async function main() {
 
   stdLog('Checking sell rate in pricing contract...');
   await checkRateInPricingContract(rate,false);
+
+  ////////////////////////////
+  // CHECK RESERVE CONTRACT //
+  ////////////////////////////
+  rate = await reserveInstance.methods.getConversionRate(
+    ETH_ADDRESS,
+    tokenAddress, // conversionToken
+    srcQty, // srcQty
+    0 // blockNumber
+  ).call();
+  stdLog('Checking buy rate in reserve contract...');
+  await checkRateInReserveContract(rate,true);
+
+  rate = await reserveInstance.methods.getConversionRate(
+    tokenAddress,
+    ETH_ADDRESS,
+    srcQty, // srcQty
+    0 // blockNumber
+  ).call();
+  stdLog('Checking sell rate in reserve contract...');
+  await checkRateInReserveContract(rate,false);
   process.exit(0);
 }
 
+//////////////////////////////////////////////
+/// PRICING CONTRACT RATE HELPER FUNCTIONS ///
+//////////////////////////////////////////////
 async function checkRateInPricingContract(rate,isBuy) {
   if(isRateZero(rate)) {
     rate = await checkRateWithE(reserveBalance,isBuy);
@@ -142,6 +166,56 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
     }
   }
   stdLog(`Rate In Precision: ${rateInPrecision}`);
+}
+
+
+//////////////////////////////////////////////
+/// RESERVE CONTRACT RATE HELPER FUNCTIONS ///
+//////////////////////////////////////////////
+async function checkRateInPricingContract(rate,isBuy) {
+  if isRateZero(rate) {
+    tradeEnabled = await reserveInstance.methods.tradeEnabled().call();
+    if (!tradeEnabled) {
+      stdLog(`Trade has been disabled for this token.`);
+      process.exit(0);
+    }
+
+    if (isBuy) {
+      srcToken = ETH_ADDRESS;
+      destToken = tokenAddress;
+    } else {
+      srcToken = tokenAddress;
+      destToken = ETH_ADDRESS;
+    }
+
+    destQty = await reserveInstance.methods.getDestQty(srcToken,destToken,srcQty,rate).call();
+    destBalance = await reserveInstance.getBalance(destToken).call()
+    stdLog(`Expected dest qty: ${destQty}`);
+    stdLog(`destBalance: ${destBalance}`);
+    await verifyDestBalance(destToken);
+
+    destBalance = new BN(destBalance);
+    destQty = new BN(destQty);
+    if (destBalance.isLessThan(destQty)) {
+      stdLog(`Insufficient dest tokens (or allowance) in reserve!`);
+      process.exit(0);
+    }
+    sanityRatesContract = await reserveInstance.methods.sanityRatesContract().call();
+    if (sanityRatesContract != NULL_ADDRESS) {
+      stdLog(`Sanity Rates: ${sanityRatesContract}`);
+      stdLog(`Rate probably exceeded sanity rates, or sanity rates contract got problem.`);
+    }
+  }
+  //Everything is ok!
+}
+
+async function verifyDestBalance(destToken) {
+  if destToken == ETH_ADDRESS { return }
+  tokenWallet = await reserveInstance.methods.tokenWallet(destToken).call();
+  if (tokenWallet == NULL_ADDRESS) {
+    stdLog(`Token wallet is null address. Reserve didn't setup fully. Get admin to set token wallet.`);
+    process.exit(0);
+  }
 }
 
 main()
