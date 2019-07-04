@@ -7,7 +7,7 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 
 //CHANGE THIS
 NETWORK = "staging"
-RESERVES_INDEXES_TO_FETCH = ["0x540f6f1b6920a984ecf1932a6c29036028253835"]
+RESERVES_INDEXES_TO_FETCH = ["0x6b84DBd29643294703dBabf8Ed97cDef74EDD227"]
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyberNetwork_ABI = config_abis.KyberNetwork;
@@ -19,7 +19,7 @@ async function main() {
   for (i=0;i<reserves.length;i++) {
     for (j=0;j<RESERVES_INDEXES_TO_FETCH.length;j++) {
       reserveAddress = RESERVES_INDEXES_TO_FETCH[j];
-      if (reserves[i].toLowerCase() == reserveAddress) {
+      if (reserves[i].toLowerCase() == reserveAddress.toLowerCase()) {
         stdLog(`Reserve address: ${reserveAddress}`);
         stdLog(`Reserve index: ${i}`);
       }

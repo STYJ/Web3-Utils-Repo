@@ -6,9 +6,9 @@ const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "rinkeby"
-AUTOMATED_RESERVE_ADDRESS = "0x26F25E6A5c511Bb45bA959dA7D5236496dD6bd26"
-TOKEN_SYMBOL = "TRAC"
+NETWORK = "mainnet"
+AUTOMATED_RESERVE_ADDRESS = "0x45eb33D008801d547990cAF3b63B4F8aE596EA57"
+TOKEN_SYMBOL = "REN"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -19,7 +19,12 @@ const erc20_token_ABI = config_abis.ERC20;
 
 async function main() {
   reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,AUTOMATED_RESERVE_ADDRESS);
-  pricingAddress = await reserveInstance.methods.conversionRatesContract().call();
+  pricingAddress = await reserveInstance.methods.conversionRatesContract().call((err,res) => {
+    if (err) {
+      stdLog(`Error: Check that reserve address is correct.`);
+      stdLog(`Error: ${err}`);
+    }
+  });
   stdLog(`Pricing contract: ${pricingAddress}`);
   pricingInstance = new web3.eth.Contract(liquidity_conversion_rates_ABI, pricingAddress);
   tokenAddress = await pricingInstance.methods.token().call();
