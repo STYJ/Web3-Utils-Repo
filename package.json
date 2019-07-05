@@ -19,6 +19,7 @@
   "homepage": "https://github.com/STYJ/Web3-Utils-Repo#readme",
   "dependencies": {
     "bignumber.js": "^9.0.0",
+    "colors": "^1.3.3",
     "dotenv": "^8.0.0",
     "moment": "^2.24.0",
     "truffle-hdwallet-provider": "^1.0.10",

@@ -7,7 +7,7 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 
 //CHANGE THIS
 NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x45eb33D008801d547990cAF3b63B4F8aE596EA57"
+AUTOMATED_RESERVE_ADDRESS = "0x302B35bd0B01312ec2652783c04955D7200C3D9b"
 TOKEN_SYMBOL = "REN"
 TOKEN_DECIMALS = 18
 
@@ -21,14 +21,14 @@ async function main() {
   reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,AUTOMATED_RESERVE_ADDRESS);
   pricingAddress = await reserveInstance.methods.conversionRatesContract().call((err,res) => {
     if (err) {
-      stdLog(`Error: Check that reserve address is correct.`);
+      stdLog(`Error: Check that reserve address is correct.`,'error');
       stdLog(`Error: ${err}`);
     }
   });
-  stdLog(`Pricing contract: ${pricingAddress}`);
+  stdLog(`Pricing contract: ${pricingAddress}`,'cyan');
   pricingInstance = new web3.eth.Contract(liquidity_conversion_rates_ABI, pricingAddress);
   tokenAddress = await pricingInstance.methods.token().call();
-  stdLog(`Token: ${tokenAddress}`)
+  stdLog(`Token: ${tokenAddress}`,'cyan')
   tokenInstance = new web3.eth.Contract(erc20_token_ABI, tokenAddress);
 
   ////////////////////
@@ -91,10 +91,10 @@ async function main() {
 
 function checkRateIsZero(rate, contractName) {
   if (rate == 0) {
-    stdLog(`Rate returned from ${contractName} contract is zero.`);
+    stdLog(`Rate returned from ${contractName} contract is zero.`,'error');
     process.exit(0);
   } else {
-    stdLog(`${contractName} contract returning rate, OK!`);
+    stdLog(`${contractName} contract returning rate, OK!`,'success');
   }
 }
 
@@ -102,24 +102,24 @@ function verifyInitialPrice(rate1,rate2,contractName) {
   rateDiffInPercent = (rate1 - config_params.initial_price) / config_params.initial_price * 100;
   //Check that initial price is within acceptable bounds
   if(Math.abs(rateDiffInPercent - config_params.fee_percent) > 0.5) {
-    stdLog(`Error: Initial price in ${contractName} contract off from desired by ${rateDiffInPercent - config_params.fee_percent}`);
+    stdLog(`Error: Initial price in ${contractName} contract off from desired by ${rateDiffInPercent - config_params.fee_percent}`,'red');
     stdLog(`Expected Price: ${config_params.initial_price}`);
     stdLog(`Actual Price: ${ rate1 }`);
   } else {
-    stdLog(`Initial price in ${contractName} contract OK!`)
+    stdLog(`Initial price in ${contractName} contract OK!`,'success')
   };
 }
 
 const verifyPriceMovement = function(rate1,rate2,contractName) {
   rateDiffInPercent = (rate2 - rate1) / rate1;
   if(Math.abs(rateDiffInPercent - (config_params.liquidity_rate / 2)) > 0.0001) {
-    stdLog(`Error: Price movement in ${contractName} contract off from desired.`);
+    stdLog(`Error: Price movement in ${contractName} contract off from desired.`,'red');
     stdLog(`Expected movement: ${config_params.liquidity_rate / 2}`);
     stdLog(`Actual movement: ${rateDiffInPercent}`);
     stdLog(`1 ETH --> 1 ${TOKEN_SYMBOL} = ${rate1} ETH`);
     stdLog(`2 ETH --> 1 ${TOKEN_SYMBOL} = ${rate2} ETH`);
   } else {
-    stdLog(`Price movement in ${contractName} OK!`);
+    stdLog(`Price movement in ${contractName} OK!`,'success');
   }
 }
 
@@ -128,11 +128,11 @@ async function checkETHBalance(reserveAddress) {
   actualETHBalance = await web3.eth.getBalance(reserveAddress);
   imbalance = Math.abs(actualETHBalance - expectedETHBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial ETH balance off by ${imbalance}`);
+    stdLog(`Error: Initial ETH balance off by ${imbalance}`,'red');
     stdLog(`Expected ETH balance: ${config_params.initial_ether_amount}`);
     stdLog(`Actual ETH balance: ${actualETHBalance/10**18}`);
   } else {
-    stdLog(`Reserve ether balance OK!`);
+    stdLog(`Reserve ether balance OK!`,'success');
   }
 }
 
@@ -141,11 +141,11 @@ async function checkTokenBalance(tokenInstance,reserveAddress) {
   acutalTokenBalance = await tokenInstance.methods.balanceOf(reserveAddress);
   imbalance = Math.abs(acutalTokenBalance - expectedTokenBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial token balance off by ${imbalance}`);
+    stdLog(`Error: Initial token balance off by ${imbalance}`,'red');
     stdLog(`Expected token balance: ${config_params.initial_token_amount}`);
     stdLog(`Actual token balance: ${acutalTokenBalance/10**TOKEN_DECIMALS}`);
   } else {
-    stdLog(`Reserve token balance OK!`);
+    stdLog(`Reserve token balance OK!`,'success');
   }
 }
 

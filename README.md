@@ -36,7 +36,19 @@ Obtain the following information for an orderbook reserve:
 7. Kyber Network address
 
 ### `getTokenInfo.js` - Get Token Info
-Useful for use in other scripts
+Useful for use in other scripts. Parameters below:
+1. Network: What network to use. Exclude staging.
+2. onlyPermissioned: Whether to filter for only permissioned reserves.
+3. tokensToGet: Use if only specific tokens are needed.
+
+#### All Tokens
+```
+import { getTokenInfo } from "./getTokenInfo.js";
+const NETWORK = "ropsten"
+await getTokenInfo(NETWORK,false,'');
+```
+
+#### Specific Tokens
 ```
 import { getTokenInfo } from "./getTokenInfo.js";
 const NETWORK = "ropsten"

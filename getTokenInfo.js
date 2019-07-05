@@ -19,12 +19,13 @@ module.exports = {
     tokenInfoRequest = await fetch(url);
     tokenInfo = await tokenInfoRequest.json()
     tokenInfo = tokenInfo.data
-    result = {}
+    if (!tokensToGet) return tokenInfo;
+    result = []
     for (var i=0; i<tokensToGet.length; i++) {
       for (var j=0; j<tokenInfo.length; j++) {
         token = tokenInfo[j];
         if (token.symbol == tokensToGet[i]) {
-          result[token.symbol] = token;
+          result.push(token);
         }
       }
     }

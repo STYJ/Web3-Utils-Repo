@@ -13,7 +13,7 @@ const {addresses, wallets, web3} = connect(NETWORK);
 const orderbook_reserve_ABI = config_abis.OrderbookReserve;
 
 async function main() {
-  stdLog(`----------START----------`)
+  stdLog(`----------START----------`,'header')
   for (var i=0;i<ORDERBOOK_RESERVES.length;i++) {
     orderbookReserveAddress = ORDERBOOK_RESERVES[i];
     orderbookInstance = new web3.eth.Contract(orderbook_reserve_ABI,orderbookReserveAddress);

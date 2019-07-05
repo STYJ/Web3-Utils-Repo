@@ -40,28 +40,28 @@ async function main() {
   checkRateIsZero(expectedRate,'proxy');
 
   if (expectedRate > reserveRate) {
-    stdLog(`Error: Rate not from desired reserve. Please disable other reserves offering this token pair.`);
+    stdLog(`Error: Rate not from desired reserve. Please disable other reserves offering this token pair.`,'error');
     stdLog(`Proxy Rate: ${expectedRate}`);
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
   } else if (expectedRate < reserveRate) {
-    stdLog(`Error: Reserve not added into network. Please do so, and disable other reserves`);
+    stdLog(`Error: Reserve not added into network. Please do so, and disable other reserves`,'error');
     stdLog(`Proxy Rate: ${expectedRate}`);
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
   } else {
-    stdLog(`Proxy showing reserve rate, OK!`);
+    stdLog(`Proxy showing reserve rate, OK!`,'success');
     process.exit(0);
   }
 }
 
 function checkRateIsZero(rate, contractName) {
   if (rate == 0) {
-    stdLog(`Error: Rate returned from ${contractName} contract is zero.`);
-    stdLog(`Check if reserve is added into network.`);
+    stdLog(`Error: Rate returned from ${contractName} contract is zero.`,'error');
+    stdLog(`Check if reserve is added into network.`,'error');
     process.exit(0);
   } else {
-    stdLog(`${contractName} contract returning rate, OK!`);
+    stdLog(`${contractName} contract returning rate, OK!`,'success');
   }
 }
 

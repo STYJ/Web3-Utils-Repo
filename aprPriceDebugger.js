@@ -85,7 +85,7 @@ async function checkRateInPricingContract(rate,isBuy) {
       delta = await checkDelta(reserveBalance,isBuy);
       await getRateWithDelta(delta,reserveBalance,isBuy);
     } else {
-      stdLog('Rate exceeds MAX_RATE. Can only support 1 ETH <> 1B tokens max.');
+      stdLog('Rate exceeds MAX_RATE. Can only support 1 ETH <> 1B tokens max.','error');
       process.exit(0);
     }
   }
@@ -110,7 +110,7 @@ async function validateEInFp(reserveBalance) {
   maxQtyInFp = new BN(maxQtyInFp);
 
   if (eInFp.isGreaterThan(maxQtyInFp)) {
-    stdLog(`eInFp (Ether balance) too large, exceeds maxQtyInFp. Try withdrawing some ETH.`);
+    stdLog(`eInFp (Ether balance) too large, exceeds maxQtyInFp. Try withdrawing some ETH.`,'error');
     stdLog(`eInFp: ${eInFp}`);
     stdLog(`maxQtyInFp: ${maxQtyInFp}`);
     process.exit(0);
@@ -126,7 +126,7 @@ async function checkDelta(reserveBalance,isBuy) {
     deltaInFp = new BN(deltaInFp);
     maxEthCapBuyInFp = new BN(deltaInFp);
     if (deltaInFp.isGreaterThan(maxEthCapBuyInFp)) {
-      stdLog(`srcQty in FP exceeds max eth cap in FP. Try smaller srcQty.`);
+      stdLog(`srcQty in FP exceeds max eth cap in FP. Try smaller srcQty.`,'error');
       process.exit(0);
     }
   } else {
@@ -162,7 +162,7 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
     }
     maxEthCapSellInFp = await pricingInstance.methods.maxEthCapSellInFp().call();
     if (deltaEInFp > maxEthCapSellInFp) {
-      stdLog(`Swap value too large, exceeds sell cap. Try smaller srcQty`);
+      stdLog(`Swap value too large, exceeds sell cap. Try smaller srcQty`,'error');
     }
   }
   stdLog(`Rate In Precision: ${rateInPrecision}`);
@@ -176,7 +176,7 @@ async function checkRateInPricingContract(rate,isBuy) {
   if isRateZero(rate) {
     tradeEnabled = await reserveInstance.methods.tradeEnabled().call();
     if (!tradeEnabled) {
-      stdLog(`Trade has been disabled for this token.`);
+      stdLog(`Trade has been disabled for this token.`,'error');
       process.exit(0);
     }
 
@@ -197,13 +197,13 @@ async function checkRateInPricingContract(rate,isBuy) {
     destBalance = new BN(destBalance);
     destQty = new BN(destQty);
     if (destBalance.isLessThan(destQty)) {
-      stdLog(`Insufficient dest tokens (or allowance) in reserve!`);
+      stdLog(`Insufficient dest tokens (or allowance) in reserve!`,'error');
       process.exit(0);
     }
     sanityRatesContract = await reserveInstance.methods.sanityRatesContract().call();
     if (sanityRatesContract != NULL_ADDRESS) {
       stdLog(`Sanity Rates: ${sanityRatesContract}`);
-      stdLog(`Rate probably exceeded sanity rates, or sanity rates contract got problem.`);
+      stdLog(`Rate probably exceeded sanity rates, or sanity rates contract got problem.`,'error');
     }
   }
   //Everything is ok!
@@ -213,7 +213,7 @@ async function verifyDestBalance(destToken) {
   if destToken == ETH_ADDRESS { return }
   tokenWallet = await reserveInstance.methods.tokenWallet(destToken).call();
   if (tokenWallet == NULL_ADDRESS) {
-    stdLog(`Token wallet is null address. Reserve didn't setup fully. Get admin to set token wallet.`);
+    stdLog(`Token wallet is null address. Reserve didn't setup fully. Get admin to set token wallet.`,'error');
     process.exit(0);
   }
 }
