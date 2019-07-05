@@ -35,6 +35,12 @@ Obtain the following information for an orderbook reserve:
 6. Fee burner contract address
 7. Kyber Network address
 
+### `getReserveBalances.js` - Get Reserve Balances
+Reads the `./currencies` API, then for each reserve, obtains the ETH and token balances.
+
+### `getReserveStatuses.js` - Get Reserve Status
+Iterates through each reserve to see if they return a conversion rate for their token pair(s).
+
 ### `getTokenInfo.js` - Get Token Info
 Useful for use in other scripts. Parameters below:
 1. Network: What network to use. Exclude staging.

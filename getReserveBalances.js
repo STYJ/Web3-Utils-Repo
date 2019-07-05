@@ -33,7 +33,6 @@ async function getReserveBalancesPerToken(tokenInfo) {
       token.symbol = token.address
     }
     stdLog(`---- RESERVE INFO FOR ${token.symbol} --- `, 'header')
-    reserveBalances = []
     for (var j=0; j<token.reserves_src.length;j++) {
       reserve = token.reserves_src[j];
       //handle exceptions like Uniswap, DutchX, Eth2Dai reserves
