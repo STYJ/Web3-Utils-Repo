@@ -6,9 +6,9 @@ const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x302B35bd0B01312ec2652783c04955D7200C3D9b"
-TOKEN_SYMBOL = "REN"
+NETWORK = "ropsten"
+AUTOMATED_RESERVE_ADDRESS = "0x4595CBE9C126559ced43c5082C729d3BBF0A9662"
+TOKEN_SYMBOL = "BTU"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";

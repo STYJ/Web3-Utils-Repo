@@ -7,7 +7,7 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 
 //CHANGE THIS
 NETWORK = "staging"
-RESERVES_INDEXES_TO_FETCH = ["0x6b84DBd29643294703dBabf8Ed97cDef74EDD227"]
+RESERVES_INDEXES_TO_FETCH = ["0x302b35bd0b01312ec2652783c04955d7200c3d9b"]
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyberNetwork_ABI = config_abis.KyberNetwork;

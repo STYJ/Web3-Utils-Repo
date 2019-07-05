@@ -7,12 +7,14 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 const BN = require('bignumber.js');
 
 //CHANGE THIS
-NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x45eb33D008801d547990cAF3b63B4F8aE596EA57"
-TOKEN_SYMBOL = "REN"
+NETWORK = "ropsten"
+AUTOMATED_RESERVE_ADDRESS = "0x4595CBE9C126559ced43c5082C729d3BBF0A9662"
+TOKEN_SYMBOL = "BTU"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyber_reserve_ABI = config_abis.KyberReserve;
 const liquidity_conversion_rates_ABI = config_abis.LiquidityConversionRates;
@@ -22,10 +24,10 @@ async function main() {
   reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,AUTOMATED_RESERVE_ADDRESS);
   reserveBalance = await web3.eth.getBalance(AUTOMATED_RESERVE_ADDRESS);
   pricingAddress = await reserveInstance.methods.conversionRatesContract().call();
-  stdLog(`Pricing contract: ${pricingAddress}`);
+  stdLog(`Pricing contract: ${pricingAddress}`,'cyan');
   pricingInstance = new web3.eth.Contract(liquidity_conversion_rates_ABI, pricingAddress);
   tokenAddress = await pricingInstance.methods.token().call();
-  stdLog(`Token: ${tokenAddress}`);
+  stdLog(`Token: ${tokenAddress}`,'cyan');
   srcQty = web3.utils.toWei('1');
 
   ////////////////////////////
@@ -89,6 +91,8 @@ async function checkRateInPricingContract(rate,isBuy) {
       process.exit(0);
     }
   }
+  stdLog('Rate returned, OK!','success');
+  stdLog(`Rate: ${rate}`,'success');
   //Everything is ok!
 }
 
@@ -172,8 +176,8 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
 //////////////////////////////////////////////
 /// RESERVE CONTRACT RATE HELPER FUNCTIONS ///
 //////////////////////////////////////////////
-async function checkRateInPricingContract(rate,isBuy) {
-  if isRateZero(rate) {
+async function checkRateInReserveContract(rate,isBuy) {
+  if (isRateZero(rate)) {
     tradeEnabled = await reserveInstance.methods.tradeEnabled().call();
     if (!tradeEnabled) {
       stdLog(`Trade has been disabled for this token.`,'error');
@@ -188,14 +192,26 @@ async function checkRateInPricingContract(rate,isBuy) {
       destToken = ETH_ADDRESS;
     }
 
+    rate = await pricingInstance.methods.getRate(
+      tokenAddress,
+      0,
+      isBuy,
+      srcQty
+    ).call()
+
     destQty = await reserveInstance.methods.getDestQty(srcToken,destToken,srcQty,rate).call();
-    destBalance = await reserveInstance.getBalance(destToken).call()
+    destBalance = await reserveInstance.methods.getBalance(destToken).call()
     stdLog(`Expected dest qty: ${destQty}`);
     stdLog(`destBalance: ${destBalance}`);
     await verifyDestBalance(destToken);
 
     destBalance = new BN(destBalance);
     destQty = new BN(destQty);
+    if (destQty == 0) {
+      stdLog(`Expected dest qty is zero for some reason`,'error');
+      process.exit(0);
+    }
+    
     if (destBalance.isLessThan(destQty)) {
       stdLog(`Insufficient dest tokens (or allowance) in reserve!`,'error');
       process.exit(0);
@@ -204,13 +220,16 @@ async function checkRateInPricingContract(rate,isBuy) {
     if (sanityRatesContract != NULL_ADDRESS) {
       stdLog(`Sanity Rates: ${sanityRatesContract}`);
       stdLog(`Rate probably exceeded sanity rates, or sanity rates contract got problem.`,'error');
+      process.exit(0);
     }
   }
   //Everything is ok!
+  stdLog('Reserve contract returned rate, OK!','success');
+  stdLog(`Rate: ${rate}`,'success');
 }
 
 async function verifyDestBalance(destToken) {
-  if destToken == ETH_ADDRESS { return }
+  if (destToken == ETH_ADDRESS) { return }
   tokenWallet = await reserveInstance.methods.tokenWallet(destToken).call();
   if (tokenWallet == NULL_ADDRESS) {
     stdLog(`Token wallet is null address. Reserve didn't setup fully. Get admin to set token wallet.`,'error');
