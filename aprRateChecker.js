@@ -1,14 +1,15 @@
 const fs = require('fs');
 const connect = require("./fetchWeb3.js").connect;
 const stdLog = require("./stdLog.js").stdLog;
+const BN = require('bignumber.js');
 
 const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "ropsten"
-AUTOMATED_RESERVE_ADDRESS = "0x4595CBE9C126559ced43c5082C729d3BBF0A9662"
-TOKEN_SYMBOL = "BTU"
+NETWORK = "staging"
+AUTOMATED_RESERVE_ADDRESS = "0x0232Ba609782Cea145Ec3663F52CF7aEb4AC773C"
+TOKEN_SYMBOL = "eQUAD"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -128,7 +129,7 @@ async function checkETHBalance(reserveAddress) {
   actualETHBalance = await web3.eth.getBalance(reserveAddress);
   imbalance = Math.abs(actualETHBalance - expectedETHBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial ETH balance off by ${imbalance}`,'red');
+    stdLog(`Error: Initial ETH balance off by ${imbalance/10**18}`,'red');
     stdLog(`Expected ETH balance: ${config_params.initial_ether_amount}`);
     stdLog(`Actual ETH balance: ${actualETHBalance/10**18}`);
   } else {
@@ -138,12 +139,14 @@ async function checkETHBalance(reserveAddress) {
 
 async function checkTokenBalance(tokenInstance,reserveAddress) {
   expectedTokenBalance = config_params.initial_token_amount * 10**TOKEN_DECIMALS;
-  acutalTokenBalance = await tokenInstance.methods.balanceOf(reserveAddress);
-  imbalance = Math.abs(acutalTokenBalance - expectedTokenBalance);
+  actualTokenBalance = await tokenInstance.methods.balanceOf(reserveAddress).call();
+  expectedTokenBalance = new BN(expectedTokenBalance);
+  actualTokenBalance = new BN(actualTokenBalance);
+  imbalance = expectedTokenBalance.minus(actualTokenBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial token balance off by ${imbalance}`,'red');
+    stdLog(`Error: Initial token balance off by ${imbalance/10**TOKEN_DECIMALS}`,'red');
     stdLog(`Expected token balance: ${config_params.initial_token_amount}`);
-    stdLog(`Actual token balance: ${acutalTokenBalance/10**TOKEN_DECIMALS}`);
+    stdLog(`Actual token balance: ${actualTokenBalance/10**TOKEN_DECIMALS}`);
   } else {
     stdLog(`Reserve token balance OK!`,'success');
   }

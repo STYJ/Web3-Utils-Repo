@@ -22,6 +22,10 @@ Checks that initial price and movement is as determined in liquidity params for 
 ### `checkReserveRatesOnKN.js` - Check Reserve Rates On Kyber Network (Ropsten / Staging)
 Checks that the rate set by the reserve can be seen in kyber network proxy, after addition to the network
 
+### `genDataFieldForAddRemoveReserve.js` - Generate data field for add and remove reserve functions
+Due to Gnosis multisig UI, adding or remove reserve has to be done via MEW / MyCrypto. This script generates the data
+field required for those functions.
+
 ### `get_liquidity_params.py` - Get liquidity params
 `python3 get_liquidity_params.py --input ./config/liquidity_input_params.json --get params`
 
@@ -49,14 +53,14 @@ Useful for use in other scripts. Parameters below:
 
 #### All Tokens
 ```
-import { getTokenInfo } from "./getTokenInfo.js";
+const getTokenInfo = require("./getTokenInfo.js").getTokenInfo;
 const NETWORK = "ropsten"
 await getTokenInfo(NETWORK,false,'');
 ```
 
 #### Specific Tokens
 ```
-import { getTokenInfo } from "./getTokenInfo.js";
+const getTokenInfo = require("./getTokenInfo.js").getTokenInfo;
 const NETWORK = "ropsten"
 await getTokenInfo(NETWORK,false,["BAT","MYB"]);
 ```
