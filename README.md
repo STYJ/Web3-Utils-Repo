@@ -26,6 +26,9 @@ Checks that the rate set by the reserve can be seen in kyber network proxy, afte
 Due to Gnosis multisig UI, adding or remove reserve has to be done via MEW / MyCrypto. This script generates the data
 field required for those functions.
 
+### `genLimitOrderParams.js` - Generate limit order params
+Generate the limit order parameters needed for a limit order. Works with either private key or the HD wallet provdier in the .env file
+
 ### `get_liquidity_params.py` - Get liquidity params
 `python3 get_liquidity_params.py --input ./config/liquidity_input_params.json --get params`
 
