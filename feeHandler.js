@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
+require('dotenv').config();
 const Axios = require('axios');
 const BN = require('bn.js');
 const fs = require('fs');
+const Telegraf = require('telegraf');
 const Web3 = require('web3');
 const winston = require('winston');
 const { config,
@@ -10,15 +12,17 @@ const { config,
         privateKey,
         provider,
         queryOnly,
+        sendToTelegram,
       } = require('yargs')
-      .usage('Usage: $0 --config [path] --gas-price [gwei] --private-key [file] --provider [provider] --query-only')
+      .usage('Usage: $0 --config [path] --gas-price [gwei] --private-key [file] --provider [provider] --query-only --send-to-telegram')
       .demandOption(['config', 'privateKey'])
       .argv;
+const configuration = JSON.parse(fs.readFileSync(config, 'utf8'));
 const axios = Axios.create({
-  baseURL: 'https://api.etherscan.io',
+  baseURL: 'https://api.etherscan.io/',
   timeout: 20000,
 });
-const configuration = JSON.parse(fs.readFileSync(config, 'utf8'));
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
 const logfile = 'logs/feeHandler';
 try {
   fs.unlinkSync(`${logfile}_info.log`);
@@ -63,9 +67,10 @@ let FeeBurnerInstance;
 let WrapFeeBurnerInstance;
 let KNCInstance;
 
-require('dotenv').config();
-
 process.on('unhandledRejection', console.error.bind(console));
+bot.catch((err) => {
+  logger.error('ERROR: Telegram bot encountered some error.');
+})
 
 function tx(result, text) {
   logger.info();
@@ -105,6 +110,10 @@ async function sendTx(txObject) {
 
   // return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
   return 0;
+}
+
+async function sendTelegram(message) {
+  await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, message);
 }
 
 async function getABI(address) {
@@ -204,7 +213,9 @@ async function validate(reserve) {
   total = total.add(totalFees);
 
   if (totalFees.gt(new BN(usableKNC))) {
-      logger.error(`ERROR: Reserve: ${configuration.reserve_names[reserve]} (${reserve})\n\nUsable KNC (${web3.utils.fromWei(usableKNC)}) is less than the Total Fees needed (${web3.utils.fromWei(totalFees)})\n\n`);
+      const text = `VALIDATION ERROR: ${configuration.reserve_names[reserve]} (${reserve})\n\nUsable KNC (${web3.utils.fromWei(usableKNC)}) is less than the Total Fees needed (${web3.utils.fromWei(totalFees)})\n\n`
+      logger.error(text);
+      sendTelegram(text);
       errors += 1;
 
       return false
@@ -235,6 +246,7 @@ async function doShareFees(reserve) {
 
 async function main() {
   logger.info('- START -');
+  sendTelegram('I am now running the feeHandler.js script.');
 
   web3 = getProvider();
   await setInstances();
@@ -276,6 +288,8 @@ async function main() {
   logger.info(`ETH Spent for Txs: ${web3.utils.fromWei(new BN(initialETH).sub(new BN(finalETH)))}`);
   logger.error(`Errors: ${errors}`);
 
+  sendTelegram(`Expecting to burn approximately ${web3.utils.fromWei(total)} KNC in next burn.`);
+  sendTelegram('I have finished running the feeHandler.js script.');
   logger.info('- END -');
 }
 
