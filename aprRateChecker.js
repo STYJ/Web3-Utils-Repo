@@ -5,11 +5,12 @@ const BN = require('bignumber.js');
 
 const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
+const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
 
 //CHANGE THIS
 NETWORK = "staging"
 AUTOMATED_RESERVE_ADDRESS = "0x0232Ba609782Cea145Ec3663F52CF7aEb4AC773C"
-TOKEN_SYMBOL = "eQUAD"
+TOKEN_SYMBOL = "eQuad"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -31,6 +32,8 @@ async function main() {
   tokenAddress = await pricingInstance.methods.token().call();
   stdLog(`Token: ${tokenAddress}`,'cyan')
   tokenInstance = new web3.eth.Contract(erc20_token_ABI, tokenAddress);
+
+  await checkContractPointingToNetwork(reserveInstance);
 
   ////////////////////
   // CHECK BALANCES //
@@ -90,6 +93,19 @@ async function main() {
   process.exit(0);
 }
 
+async function checkContractPointingToNetwork(reserveInstance) {
+  expectedNetworkAddress = config_addresses[NETWORK].KyberNetwork;
+  actualNetworkAddress = await reserveInstance.methods.kyberNetwork().call();
+  if (expectedNetworkAddress == actualNetworkAddress) {
+    stdLog(`Reserve pointing to correct network contract, OK!`,'success');
+  } else {
+    stdLog(`Reserve pointing to wrong network contract`,'error');
+    stdLog(`Expected network address: ${expectedNetworkAddress}`);
+    stdLog(`Actual network address: ${actualNetworkAddress}`);
+  }
+  return;
+}
+
 function checkRateIsZero(rate, contractName) {
   if (rate == 0) {
     stdLog(`Rate returned from ${contractName} contract is zero.`,'error');
@@ -103,9 +119,9 @@ function verifyInitialPrice(rate1,rate2,contractName) {
   rateDiffInPercent = (rate1 - config_params.initial_price) / config_params.initial_price * 100;
   //Check that initial price is within acceptable bounds
   if(Math.abs(rateDiffInPercent - config_params.fee_percent) > 0.5) {
-    stdLog(`Error: Initial price in ${contractName} contract off from desired by ${rateDiffInPercent - config_params.fee_percent}`,'red');
+    stdLog(`Error: Initial price in ${contractName} contract off from desired by ${rateDiffInPercent - config_params.fee_percent}`,'error');
     stdLog(`Expected Price: ${config_params.initial_price}`);
-    stdLog(`Actual Price: ${ rate1 }`);
+    stdLog(`Actual Price: ${rate1}`);
   } else {
     stdLog(`Initial price in ${contractName} contract OK!`,'success')
   };
@@ -114,7 +130,7 @@ function verifyInitialPrice(rate1,rate2,contractName) {
 const verifyPriceMovement = function(rate1,rate2,contractName) {
   rateDiffInPercent = (rate2 - rate1) / rate1;
   if(Math.abs(rateDiffInPercent - (config_params.liquidity_rate / 2)) > 0.0001) {
-    stdLog(`Error: Price movement in ${contractName} contract off from desired.`,'red');
+    stdLog(`Error: Price movement in ${contractName} contract off from desired.`,'error');
     stdLog(`Expected movement: ${config_params.liquidity_rate / 2}`);
     stdLog(`Actual movement: ${rateDiffInPercent}`);
     stdLog(`1 ETH --> 1 ${TOKEN_SYMBOL} = ${rate1} ETH`);
@@ -129,7 +145,7 @@ async function checkETHBalance(reserveAddress) {
   actualETHBalance = await web3.eth.getBalance(reserveAddress);
   imbalance = Math.abs(actualETHBalance - expectedETHBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial ETH balance off by ${imbalance/10**18}`,'red');
+    stdLog(`Error: Initial ETH balance off by ${imbalance/10**18}`,'error');
     stdLog(`Expected ETH balance: ${config_params.initial_ether_amount}`);
     stdLog(`Actual ETH balance: ${actualETHBalance/10**18}`);
   } else {
@@ -144,7 +160,7 @@ async function checkTokenBalance(tokenInstance,reserveAddress) {
   actualTokenBalance = new BN(actualTokenBalance);
   imbalance = expectedTokenBalance.minus(actualTokenBalance);
   if (imbalance > 1000) {
-    stdLog(`Error: Initial token balance off by ${imbalance/10**TOKEN_DECIMALS}`,'red');
+    stdLog(`Error: Initial token balance off by ${imbalance/10**TOKEN_DECIMALS}`,'error');
     stdLog(`Expected token balance: ${config_params.initial_token_amount}`);
     stdLog(`Actual token balance: ${actualTokenBalance/10**TOKEN_DECIMALS}`);
   } else {

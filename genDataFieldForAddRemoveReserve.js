@@ -6,10 +6,10 @@ const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
 const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "mainnet";
-RESERVE = "0x63825c174ab367968EC60f061753D3bbD36A0D8F";
-TOKEN = "0x5d60d8d7ef6d37e16ebabc324de3be57f135e0bc";
-IS_ADD = false; //true = add reserve, false = remove reserve
+NETWORK = "staging";
+RESERVE = "0x0232Ba609782Cea145Ec3663F52CF7aEb4AC773C";
+TOKEN = "0xC28e931814725BbEB9e670676FaBBCb694Fe7DF2";
+IS_ADD = true; //true = add reserve, false = remove reserve
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyberNetwork_ABI = config_abis.KyberNetwork;
