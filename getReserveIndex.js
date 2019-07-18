@@ -16,14 +16,15 @@ const kyberNetwork_address = config_addresses[NETWORK].KyberNetwork;
 async function main() {
   kyberNetworkContract = new web3.eth.Contract(kyberNetwork_ABI,kyberNetwork_address);
   reserves = await kyberNetworkContract.methods.getReserves().call();
-  for (i=0;i<reserves.length;i++) {
-    for (j=0;j<RESERVES_INDEXES_TO_FETCH.length;j++) {
-      reserveAddress = RESERVES_INDEXES_TO_FETCH[j];
-      if (reserves[i].toLowerCase() == reserveAddress.toLowerCase()) {
-        stdLog(`Reserve address: ${reserveAddress}`);
-        stdLog(`Reserve index: ${i}`);
-      }
+  for (i=0;i<RESERVES_INDEXES_TO_FETCH.length;i++) {
+    reserveAddress = RESERVES_INDEXES_TO_FETCH[i];
+    reserveIndex = reserves.indexOf(reserveAddress.toLowerCase());
+    stdLog(`Reserve address: ${reserveAddress}`);
+    if (reserveIndex == -1) {
+      stdLog(`Reserve not found`,`error`);
+      continue;
     }
+    stdLog(`Reserve index: ${reserveIndex}`);
   }
   process.exit(0);
 }

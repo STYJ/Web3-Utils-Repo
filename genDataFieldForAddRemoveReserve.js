@@ -7,16 +7,22 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 
 //CHANGE THIS
 NETWORK = "staging";
-RESERVE = "0x0232Ba609782Cea145Ec3663F52CF7aEb4AC773C";
-TOKEN = "0xC28e931814725BbEB9e670676FaBBCb694Fe7DF2";
+RESERVE = "0xe8bde05097722f90123c9239dcc0834db239a938";
+TOKEN = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
 IS_ADD = true; //true = add reserve, false = remove reserve
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyberNetwork_ABI = config_abis.KyberNetwork;
 const kyberNetwork_address = config_addresses[NETWORK].KyberNetwork;
+const MULTISIG = config_addresses[NETWORK].SADMultisig;
+const wallet_ABI = config_abis.GnosisMultisig;
 
 async function main() {
   kyberNetworkContract = new web3.eth.Contract(kyberNetwork_ABI,kyberNetwork_address);
+  stdLog(`SAD Multisig Wallet: ${MULTISIG}`,'header');
+  stdLog(`Wallet ABI`,'header');
+  stdLog(`${JSON.stringify(wallet_ABI)}`);
+
   if (IS_ADD) {
     data = await kyberNetworkContract.methods.addReserve(RESERVE,false).encodeABI();
     stdLog(`Add reserve ${RESERVE}`,'header');

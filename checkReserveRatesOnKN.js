@@ -7,9 +7,9 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "ropsten"
-AUTOMATED_RESERVE_ADDRESS = "0x4595cbe9c126559ced43c5082c729d3bbf0a9662"
-TOKEN_ADDRESS = "0xFcD404Ec70c662128d3A6bD508DFB3E598d79A0c"
+NETWORK = "staging"
+AUTOMATED_RESERVE_ADDRESS = "0x06ae0623908ab54550ed1a6a249c1e26aa961b9c"
+TOKEN_ADDRESS = "0xc011a72400e58ecd99ee497cf89e3775d4bd732f"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";

@@ -9,8 +9,8 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 
 //CHANGE THIS
 NETWORK = "staging"
-AUTOMATED_RESERVE_ADDRESS = "0x0232Ba609782Cea145Ec3663F52CF7aEb4AC773C"
-TOKEN_SYMBOL = "eQuad"
+AUTOMATED_RESERVE_ADDRESS = "0x06AE0623908aB54550Ed1a6a249C1E26Aa961B9C"
+TOKEN_SYMBOL = "SNX"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";

@@ -7,9 +7,9 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 const BN = require('bignumber.js');
 
 //CHANGE THIS
-NETWORK = "ropsten"
-AUTOMATED_RESERVE_ADDRESS = "0x4595CBE9C126559ced43c5082C729d3BBF0A9662"
-TOKEN_SYMBOL = "BTU"
+NETWORK = "staging"
+AUTOMATED_RESERVE_ADDRESS = "0x4Cb01bd05E4652CbB9F312aE604f4549D2bf2C99"
+TOKEN_SYMBOL = "sUSD"
 TOKEN_DECIMALS = 18
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
@@ -211,7 +211,7 @@ async function checkRateInReserveContract(rate,isBuy) {
       stdLog(`Expected dest qty is zero for some reason`,'error');
       process.exit(0);
     }
-    
+
     if (destBalance.isLessThan(destQty)) {
       stdLog(`Insufficient dest tokens (or allowance) in reserve!`,'error');
       process.exit(0);

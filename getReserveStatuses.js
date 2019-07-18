@@ -12,7 +12,7 @@ const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
 //CHANGE THIS
 NETWORK = "mainnet" //Will not work on staging since no staging API!
-TOKENS_TO_FETCH = ['PAY']
+TOKENS_TO_FETCH = ['REN']
 SRC_QUERY_AMOUNT = '0.1'
 const {addresses, wallets, web3} = connect(NETWORK);
 
