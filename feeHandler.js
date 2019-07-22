@@ -55,6 +55,8 @@ const logger = winston.createLogger({
 
 let errors = 0;
 let total = new BN(0);
+let totalBurned = new BN(0);
+let totalShared = new BN(0);
 let account;
 let reserves;
 let feeSharingWallets;
@@ -75,7 +77,7 @@ bot.catch((err) => {
 function tx(result, text) {
   logger.info();
   logger.info(`   ${text}`);
-  logger.info('   ------------------------');
+  logger.info('   --------------------------');
   logger.info(`   > transaction hash: ${result.transactionHash}`);
   logger.info(`   > gas used: ${result.gasUsed}`);
   logger.info();
@@ -108,12 +110,14 @@ async function sendTx(txObject) {
 
   const signedTx = await web3.eth.accounts.signTransaction(txParams, txKey);
 
-  // return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-  return 0;
+  logger.info(`Broadcasting tx: ${signedTx.rawTransaction}`);
+  return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 }
 
 async function sendTelegram(message) {
-  await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, message);
+  if (sendToTelegram) {
+    await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, message);
+  }
 }
 
 async function getABI(address) {
@@ -158,7 +162,7 @@ async function getGasPrice() {
 async function getFeeSharingWallets() {
   const feeSharingWallets = await WrapFeeBurnerInstance.methods.getFeeSharingWallets().call();
   for (let wallet in configuration.wallets) {
-      feeSharingWallets.push(configuration.wallets[wallet]);
+    feeSharingWallets.push(configuration.wallets[wallet]);
   }
 
   return feeSharingWallets;
@@ -204,7 +208,7 @@ async function validate(reserve) {
 
   let sharingFees = new BN(0);
   for (let index in feeSharingWallets) {
-      sharingFees = sharingFees.add(new BN(await FeeBurnerInstance.methods.reserveFeeToWallet(reserve, feeSharingWallets[index]).call()));
+    sharingFees = sharingFees.add(new BN(await FeeBurnerInstance.methods.reserveFeeToWallet(reserve, feeSharingWallets[index]).call()));
   }
   logger.info(`Reserve Fees to Share: ${web3.utils.fromWei(sharingFees)}`);
 
@@ -213,12 +217,12 @@ async function validate(reserve) {
   total = total.add(totalFees);
 
   if (totalFees.gt(new BN(usableKNC))) {
-      const text = `VALIDATION ERROR: ${configuration.reserve_names[reserve]} (${reserve})\n\nUsable KNC (${web3.utils.fromWei(usableKNC)}) is less than the Total Fees needed (${web3.utils.fromWei(totalFees)})\n\n`
-      logger.error(text);
-      sendTelegram(text);
-      errors += 1;
+    const text = `VALIDATION ERROR: ${configuration.reserve_names[reserve]} (${reserve})\n\nUsable KNC (${web3.utils.fromWei(usableKNC)}) is less than the Total Fees needed (${web3.utils.fromWei(totalFees)})\n\n`
+    logger.error(text);
+    sendTelegram(text);
+    errors += 1;
 
-      return false
+    return false
   }
 
   return true
@@ -227,20 +231,28 @@ async function validate(reserve) {
 async function doBurnFees(reserve) {
   const fees = new BN(await FeeBurnerInstance.methods.reserveFeeToBurn(reserve).call());
   if (fees.gte(new BN(configuration.KNC_MINIMAL_TX_AMOUNT))) {
+    try {
       const result = await sendTx(FeeBurnerInstance.methods.burnReserveFees(reserve));
-      // tx(result, `Burnt ${web3.utils.fromWei(fees)} from ${reserve}`);
+      tx(result, `Burnt ${web3.utils.fromWei(fees)}`);
+      totalBurned = totalBurned.add(fees);
+    } catch (e) {
+      logger.error(e);
+    }
   }
 }
 
 async function doShareFees(reserve) {
-  let fees;
-
   for (let index in feeSharingWallets) {
-      fees = new BN(await FeeBurnerInstance.methods.reserveFeeToWallet(reserve, feeSharingWallets[index]).call());
-      if (fees.gte(new BN(configuration.KNC_MINIMAL_TX_AMOUNT))) {
+    const fees = new BN(await FeeBurnerInstance.methods.reserveFeeToWallet(reserve, feeSharingWallets[index]).call());
+    if (fees.gte(new BN(configuration.KNC_MINIMAL_TX_AMOUNT))) {
+      try {
         const result = await sendTx(FeeBurnerInstance.methods.sendFeeToWallet(feeSharingWallets[index], reserve));
-        // tx(result, `Fee ${web3.utils.fromWei(fees)} shared to ${feeSharingWallets[index]} from ${reserve}`);
+        tx(result, `Shared ${web3.utils.fromWei(fees)}`);
+        totalShared = totalShared.add(fees);
+      } catch (e) {
+        logger.error(e);
       }
+    }
   }
 }
 
@@ -253,6 +265,7 @@ async function main() {
   account = getAccount();
   gas_price = await getGasPrice();
   reserves = await NetworkInstance.methods.getReserves().call();
+  // reserves = configuration.test;
   feeSharingWallets = await getFeeSharingWallets();
 
   logger.info(`Account: ${account.address}`);
@@ -282,13 +295,19 @@ async function main() {
   }
 
   logger.info(`TOTAL FEES ALL RESERVES: ${web3.utils.fromWei(total)}`);
+  if (queryOnly) {
+    sendTelegram('This is query run only. No fees were burned or shared.');
+  } else {
+    logger.info(`TOTAL FEES BURNED: ${web3.utils.fromWei(totalBurned)}`);
+    logger.info(`TOTAL FEES SHARED: ${web3.utils.fromWei(totalShared)}`);
+    sendTelegram(`KNC Fees Burned: ${web3.utils.fromWei(totalBurned)}\nKNC Fees Shared: ${web3.utils.fromWei(totalShared)}`);
+  }
   logger.info('===========================================================');
 
   let finalETH = await web3.eth.getBalance(account.address);
   logger.info(`ETH Spent for Txs: ${web3.utils.fromWei(new BN(initialETH).sub(new BN(finalETH)))}`);
   logger.error(`Errors: ${errors}`);
 
-  sendTelegram(`Expecting to burn approximately ${web3.utils.fromWei(total)} KNC in next burn.`);
   sendTelegram('I have finished running the feeHandler.js script.');
   logger.info('- END -');
 }
