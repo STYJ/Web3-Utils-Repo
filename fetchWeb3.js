@@ -22,5 +22,13 @@ module.exports = {
       wallets: wallets,
       web3: web3,
     };
+  },
+
+  connectWebsocket: function(network) {
+    if (network == 'staging') { network = 'mainnet' }
+    const project_id = process.env.INFURA_PROJECT_ID;
+    const infura_url = "wss://" + network + ".infura.io/ws/v3/" + project_id;
+    const web3 = new Web3(new Web3.providers.WebsocketProvider(infura_url));
+    return web3;
   }
 }
