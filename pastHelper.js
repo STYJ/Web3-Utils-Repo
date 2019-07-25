@@ -32,7 +32,7 @@ var self = module.exports = {
   },
 
   getPastEvents: async function (web3, contract, eventName,
-    startBlock, endBlock='latest', queryInterval=10000) {
+    startBlock, endBlock='latest', filter={}, queryInterval=100000) {
       ALL_EVENTS = []
       latestBlockNumber = await web3.eth.getBlockNumber();
       if (endBlock == 'latest') endBlock = latestBlockNumber;
@@ -41,6 +41,7 @@ var self = module.exports = {
       while (endBlock > nextBlock) {
         stdLog(`Querying event from block ${currentBlock} to ${nextBlock}`);
         pastEvents = await contract.getPastEvents(eventName,{
+          filter: filter,
           fromBlock: currentBlock,
           toBlock: nextBlock
         });
