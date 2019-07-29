@@ -8,10 +8,10 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "staging"
-AUTOMATED_RESERVE_ADDRESS = "0x06AE0623908aB54550Ed1a6a249C1E26Aa961B9C"
-TOKEN_SYMBOL = "SNX"
-TOKEN_DECIMALS = 18
+NETWORK = "mainnet"
+AUTOMATED_RESERVE_ADDRESS = "0x485c4Ec93D18eBd16623D455567886475aE28D04"
+TOKEN_SYMBOL = "WBTC"
+TOKEN_DECIMALS = 8
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const {addresses, wallets, web3} = connect(NETWORK);
@@ -155,7 +155,14 @@ async function checkETHBalance(reserveAddress) {
 
 async function checkTokenBalance(tokenInstance,reserveAddress) {
   expectedTokenBalance = config_params.initial_token_amount * 10**TOKEN_DECIMALS;
-  actualTokenBalance = await tokenInstance.methods.balanceOf(reserveAddress).call();
+  reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,reserveAddress);
+  try {
+    tokenWallet = await reserveInstance.methods.tokenWallet(tokenInstance.options.address).call();
+  } catch (e) {
+    tokenWallet = reserveAddress;
+  }
+
+  actualTokenBalance = await tokenInstance.methods.balanceOf(tokenWallet).call();
   expectedTokenBalance = new BN(expectedTokenBalance);
   actualTokenBalance = new BN(actualTokenBalance);
   imbalance = expectedTokenBalance.minus(actualTokenBalance);
