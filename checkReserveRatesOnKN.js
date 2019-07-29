@@ -8,9 +8,9 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 
 //CHANGE THIS
 NETWORK = "staging"
-AUTOMATED_RESERVE_ADDRESS = "0x06ae0623908ab54550ed1a6a249c1e26aa961b9c"
-TOKEN_ADDRESS = "0xc011a72400e58ecd99ee497cf89e3775d4bd732f"
-TOKEN_DECIMALS = 18
+AUTOMATED_RESERVE_ADDRESS = "0x485c4Ec93D18eBd16623D455567886475aE28D04"
+TOKEN_ADDRESS = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
+TOKEN_DECIMALS = 8
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const {addresses, wallets, web3} = connect(NETWORK);
@@ -45,7 +45,7 @@ async function main() {
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
   } else if (expectedRate < reserveRate) {
-    stdLog(`Error: Reserve not added into network. Please do so, and disable other reserves`,'error');
+    stdLog(`Error: Reserve not added / other reserves showing better rates. Please add reserve or disable other reserves`,'error');
     stdLog(`Proxy Rate: ${expectedRate}`);
     stdLog(`Reserve Rate: ${reserveRate}`);
     process.exit(0);
