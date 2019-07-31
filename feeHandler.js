@@ -265,7 +265,6 @@ async function main() {
   account = getAccount();
   gas_price = await getGasPrice();
   reserves = await NetworkInstance.methods.getReserves().call();
-  // reserves = configuration.test;
   feeSharingWallets = await getFeeSharingWallets();
 
   logger.info(`Account: ${account.address}`);
