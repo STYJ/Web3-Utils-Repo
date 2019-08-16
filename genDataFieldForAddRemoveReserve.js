@@ -7,9 +7,9 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 
 //CHANGE THIS
 NETWORK = "staging";
-RESERVE = "0xe8bde05097722f90123c9239dcc0834db239a938";
-TOKEN = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
-IS_ADD = true; //true = add reserve, false = remove reserve
+RESERVE = "0xa107dfa919c3f084a7893a260b99586981beb528";
+TOKEN = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+IS_ADD = false; //true = add reserve, false = remove reserve
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyberNetwork_ABI = config_abis.KyberNetwork;
@@ -50,13 +50,9 @@ async function main() {
 
 async function getReserveIndex(reserve) {
   reserves = await kyberNetworkContract.methods.getReserves().call();
-  for (i=0;i<reserves.length;i++) {
-    if (reserves[i].toLowerCase() == RESERVE.toLowerCase()) {
-      stdLog(`Reserve index: ${i}`);
-      return i;
-    }
-  }
-  return -1;
+  return reserves.findIndex(reserve => {
+    reserve.toLowerCase() == RESERVE.toLowerCase()
+  })
 }
 
 main();
