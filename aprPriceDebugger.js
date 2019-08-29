@@ -7,13 +7,14 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 const BN = require('bignumber.js');
 
 //CHANGE THIS
-NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x7e2fd015616263add31a2acc2a437557cee80fc4"
-TOKEN_SYMBOL = "UPP"
-TOKEN_DECIMALS = 18
+NETWORK = "ropsten"
+AUTOMATED_RESERVE_ADDRESS = "0xa81dea0332fa0dae88204ac26710c38ccadf534c"
+TOKEN_SYMBOL = "TIDRT"
+TOKEN_DECIMALS = 2
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const MAX_RATE = 10 ** 24;
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyber_reserve_ABI = config_abis.KyberReserve;
@@ -180,21 +181,24 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
 
 async function validateRate(rateInPrecision,isBuy) {
   if (isBuy) {
-    minAllowRate = await pricingInstance.methods.minBuyRateInPrecision.call();
-    maxAllowRate = await pricingInstance.methods.maxBuyRateInPrecision.call();
+    minAllowRate = await pricingInstance.methods.minBuyRateInPrecision().call();
+    maxAllowRate = await pricingInstance.methods.maxBuyRateInPrecision().call();
   } else {
-    minAllowRate = await pricingInstance.methods.minSellRateInPrecision.call();
-    maxAllowRate = await pricingInstance.methods.maxSellRateInPrecision.call();
+    minAllowRate = await pricingInstance.methods.minSellRateInPrecision().call();
+    maxAllowRate = await pricingInstance.methods.maxSellRateInPrecision().call();
   }
 
   if (rateInPrecision > maxAllowRate) {
     stdLog(`Rate in precision exceeds max allowed rate. Probably wrong settings, reset liquidity params.`,'error');
+    stdLog(`Rate in precision:${rateInPrecision}`);
+    stdLog(`Max allowed rate: ${maxAllowRate}`);
     process.exit(0);
   } else if (rateInPrecision < minAllowRate) {
     stdLog(`Rate in precision below min allowed rate. Probably wrong settings, reset liquidity params.`,'error');
+    stdLog(`Rate in precision: ${rateInPrecision}`);
+    stdLog(`Min allow rate: ${minAllowRate}`);
     process.exit(0);
   }
-  maxRate = await pricingInstance.methods.MAX_RATE.call();
   if (rateInPrecision > MAX_RATE) { stdLog(`Rate in precision exceeds 1M token per ETH. Price too small la.`,`error`)};
   process.exit(0);
 }
