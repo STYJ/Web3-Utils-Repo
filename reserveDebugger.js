@@ -4,14 +4,15 @@ const stdLog = require("./stdLog.js").stdLog;
 const getTokenInfo = require("./getTokenInfo.js").getTokenInfo;
 
 const config_abis = JSON.parse(fs.readFileSync('./config/ABI.json', 'utf8'));
-const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_params.json', 'utf8'));
 const BN = require('bignumber.js');
 
 //CHANGE THIS
-NETWORK = "mainnet"
-RESERVE_ADDRESS = "0x63825c174ab367968EC60f061753D3bbD36A0D8F"
-TOKEN = ["CND"]
-var TOKEN_ADDRESS;
+NETWORK = "ropsten"
+RESERVE_ADDRESS = "0x21433Dec9Cb634A23c6A4BbcCe08c83f5aC2EC18"
+TOKEN = ["PAX"]
+//OPTIONAL FIELDS
+//var TOKEN_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+var TOKEN_DECIMALS = 18;
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -19,14 +20,15 @@ const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyber_reserve_ABI = config_abis.KyberReserve;
 const conv_rate_interface_ABI = config_abis.ConversionRatesInterface;
+const sanity_rates_ABI = config_abis.SanityRates;
 const erc20_token_ABI = config_abis.ERC20;
-const BUY_QTY = web3.utils.toWei('0.5');
-const SELL_QTY = web3.utils.toWei('10');
+var BUY_QTY = web3.utils.toWei('0.5');
+var SELL_QTY;
 
 async function main() {
   tokenInfo = await getTokenInfo(NETWORK,false,TOKEN);
-  TOKEN_ADDRESS = verifyReserveInput(tokenInfo);
-
+  verifyReserveInput(tokenInfo);
+  SELL_QTY = 10 * 10 ** TOKEN_DECIMALS;
   reserveInstance = new web3.eth.Contract(kyber_reserve_ABI,RESERVE_ADDRESS);
   pricingInstance = new web3.eth.Contract(conv_rate_interface_ABI,await reserveInstance.methods.conversionRatesContract().call());
   await checkTradeEnabled();
@@ -38,13 +40,15 @@ async function main() {
 }
 
 function verifyReserveInput(tokenInfo) {
-  if (!tokenInfo[0]) return TOKEN_ADDRESS
+  if (!tokenInfo[0]) return
   tokenInfo = tokenInfo[0];
   if (tokenInfo.reserves_src.findIndex(address => (address == RESERVE_ADDRESS)) == -1) {
     stdLog(`Reserve address not found in /currencies API.`,`error`);
     process.exit(0);
   }
-  return tokenInfo.address;
+  TOKEN_ADDRESS = tokenInfo.address;
+  TOKEN_DECIMALS = tokenInfo.decimals;
+  return;
 }
 
 async function checkTradeEnabled() {
@@ -131,7 +135,11 @@ async function verifyDestLimits(srcAddress, dstAddress, qty, rate) {
     process.exit(0);
   }
 
-  stdLog(`Rate exceeds sanity rates`);
+  stdLog(`Rate exceeds sanity rates`,'error');
+  sanityRatesAddress = await reserveInstance.methods.sanityRatesContract().call();
+  sanityRatesInstance = new web3.eth.Contract(sanity_rates_ABI, sanityRatesAddress);
+  sanityRate = await sanityRatesInstance.methods.getSanityRate(srcAddress, dstAddress).call();
+  stdLog(`Sanity Rate:${sanityRate}`);
   process.exit(0);
 }
 
