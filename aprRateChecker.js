@@ -8,10 +8,8 @@ const config_params = JSON.parse(fs.readFileSync('./config/liquidity_input_param
 const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', 'utf8'));
 
 //CHANGE THIS
-NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x485c4Ec93D18eBd16623D455567886475aE28D04"
-TOKEN_SYMBOL = "WBTC"
-TOKEN_DECIMALS = 8
+NETWORK = "staging"
+AUTOMATED_RESERVE_ADDRESS = "0x3480e12b6c2438e02319e34b4c23770679169190"
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const {addresses, wallets, web3} = connect(NETWORK);
@@ -32,7 +30,8 @@ async function main() {
   tokenAddress = await pricingInstance.methods.token().call();
   stdLog(`Token: ${tokenAddress}`,'cyan')
   tokenInstance = new web3.eth.Contract(erc20_token_ABI, tokenAddress);
-
+  TOKEN_DECIMALS = await tokenInstance.methods.decimals().call();
+  TOKEN_SYMBOL = await tokenInstance.methods.symbol().call();
   await checkContractPointingToNetwork(reserveInstance);
 
   ////////////////////
@@ -96,7 +95,7 @@ async function main() {
 async function checkContractPointingToNetwork(reserveInstance) {
   expectedNetworkAddress = config_addresses[NETWORK].KyberNetwork;
   actualNetworkAddress = await reserveInstance.methods.kyberNetwork().call();
-  if (expectedNetworkAddress == actualNetworkAddress) {
+  if (expectedNetworkAddress.toLowerCase() == actualNetworkAddress.toLowerCase()) {
     stdLog(`Reserve pointing to correct network contract, OK!`,'success');
   } else {
     stdLog(`Reserve pointing to wrong network contract`,'error');
