@@ -8,9 +8,9 @@ const BN = require('bignumber.js');
 
 //CHANGE THIS
 NETWORK = "ropsten"
-AUTOMATED_RESERVE_ADDRESS = "0xa81dea0332fa0dae88204ac26710c38ccadf534c"
+AUTOMATED_RESERVE_ADDRESS = "0x3051A9d61b85e5C79D577E707E858b6211004315"
 TOKEN_SYMBOL = "TIDRT"
-TOKEN_DECIMALS = 2
+TOKEN_DECIMALS = 8
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -173,6 +173,9 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
     maxEthCapSellInFp = await pricingInstance.methods.maxEthCapSellInFp().call();
     if (deltaEInFp > maxEthCapSellInFp) {
       stdLog(`Swap value too large, exceeds sell cap. Try smaller srcQty`,'error');
+      stdLog(`deltaEInFp: ${deltaEInFp}`);
+      stdLog(`max eth cap: ${maxEthCapSellInFp}`);
+      process.exit(0);
     }
   }
   stdLog(`Rate In Precision: ${rateInPrecision}`);
