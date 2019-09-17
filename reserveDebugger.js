@@ -8,11 +8,11 @@ const BN = require('bignumber.js');
 
 //CHANGE THIS
 NETWORK = "ropsten"
-RESERVE_ADDRESS = "0x21433Dec9Cb634A23c6A4BbcCe08c83f5aC2EC18"
-TOKEN = ["PAX"]
+RESERVE_ADDRESS = "0x3051a9d61b85e5c79d577e707e858b6211004315"
+TOKEN = ["TKN"]
 //OPTIONAL FIELDS
-//var TOKEN_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-var TOKEN_DECIMALS = 18;
+var TOKEN_ADDRESS = "0xAA15075eDf8E33867687428d0E49Ae898e5B3513";
+var TOKEN_DECIMALS = 8;
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -114,7 +114,7 @@ async function verifyDestLimits(srcAddress, dstAddress, qty, rate) {
       stdLog(`Reserve has no ETH.`,'error');
       process.exit(0);
     }
-    wallet = reserveInstance.methods.tokenWallet(dstAddress).call();
+    wallet = await reserveInstance.methods.tokenWallet(dstAddress).call();
     stdLog(`Wallet Contract: ${wallet}`,'cyan');
     tokenInstance = new web3.eth.Contract(erc20_token_ABI,dstAddress);
     balanceOfWallet = await tokenInstance.methods.balanceOf(wallet).call();
