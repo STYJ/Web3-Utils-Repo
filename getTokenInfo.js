@@ -1,34 +1,22 @@
 const fetch = require("node-fetch");
 
-function getAPILink(network) {
-  if (network == 'mainnet') {
-    return("https://api.kyber.network");
-  } else {
-    return("https://" + network + "-api.kyber.network");
-  }
-}
-
 module.exports = {
-  getTokenInfo: async function(network,onlyPermissioned,tokensToGet) {
-    url = getAPILink(network);
-    if(onlyPermissioned) {
-      url = url + "/currencies?only_official_reserve=true";
-    } else {
-      url = url + "/currencies?only_official_reserve=false";
-    }
+  getTokenInfo: async function(network, onlyPermissioned, tokensToGet) {
+    prefix = network == "mainnet" ? "" : `${network}-`;
+    url = `https://${prefix}api.kyber.network/currencies?only_official_reserve=${onlyPermissioned}`;
     tokenInfoRequest = await fetch(url);
-    tokenInfo = await tokenInfoRequest.json()
-    tokenInfo = tokenInfo.data
+    tokenInfo = await tokenInfoRequest.json();
+    tokenInfo = tokenInfo.data;
     if (!tokensToGet) return tokenInfo;
-    result = []
-    for (var i=0; i<tokensToGet.length; i++) {
-      for (var j=0; j<tokenInfo.length; j++) {
-        token = tokenInfo[j];
-        if (token.symbol == tokensToGet[i]) {
-          result.push(token);
-        }
-      }
-    }
-    return result;
+
+    results = [];
+    tokensToGet.forEach(symbol => {
+      results.push(
+        tokenInfo.find(tokenDetails => {
+          return tokenDetails.symbol == symbol;
+        })
+      );
+    });
+    return results;
   }
-}
+};
