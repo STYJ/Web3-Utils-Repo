@@ -59,3 +59,6 @@ typings/
 
 # next.js build output
 .next
+
+# List of winners
+config/winners.txt
