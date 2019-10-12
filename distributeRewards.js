@@ -13,7 +13,7 @@ const configABIs = JSON.parse(fs.readFileSync("./config/ABI.json", "utf8"));
 
 const winners = (fs.readFileSync("./config/winners.txt", "utf8")).split('\n');
 
-const network = "ropsten";
+const network = "mainnet";
 const { web3, addresses, wallets } = connect(network);
 
 let KNCInstance;
@@ -38,8 +38,10 @@ async function main() {
     logger.info(`- ${parseInt(index) + 1} of ${winners.length} -`);
     logger.info(`Winner: ${winners[index]}`);
 
-    KNCAmount = new BN(5)
+    KNCAmount = new BN(156)
       .mul(new BN(10).pow(new BN(await KNCInstance.methods.decimals().call())))
+      .add(new BN(1)
+      .mul(new BN(10).pow(new BN(await KNCInstance.methods.decimals().call()).sub(new BN(1)))))
       .toString();
     result = await sendTx(
       KNCInstance.methods.transfer(winners[index], KNCAmount)
@@ -64,7 +66,7 @@ async function getInstance() {
   const KNCAddress = "0xdd974d5c2e2928dea5f71b9825b8b646686bd200";
   const RopstenKNC = "0x4E470dc7321E84CA96FcAEDD0C8aBCebbAEB68C6";
   const KNCABI = configABIs.ERC20;
-  return new web3.eth.Contract(KNCABI, RopstenKNC);
+  return new web3.eth.Contract(KNCABI, KNCAddress);
 }
 
 
