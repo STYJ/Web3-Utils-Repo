@@ -10,6 +10,13 @@ MNEMONIC=parrot consider guilt grit pull next bundle flat pepper over number rai
 ```
 
 ## Scripts
+### `getInactiveReserves.js` - Getting a list of inactive reserves (FPR + APR only)
+Retrieves a list of inactive reserves based on the `TradeExecute` event. The script will look for the `TradeExecute` event since the specified block number till the latest block.
+1) Run `getInactiveReserves.js` <block #> e.g. `node getInactiveReserves.js 8500000`
+
+### `distributeRewards.js` - Distribute rewards to winners
+Distribute funds from the first address generated from the mnemonic. Need to specify with gas-price flag. Read the code to modify for other distribution
+
 ### `aprPriceDebugger.js` - APR Rate Debugger
 Should the price for the APR reserve be zero, this script can be run to try to figure out why.
 Checks for both pricing and reserve contract.

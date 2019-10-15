@@ -8,12 +8,13 @@ const BN = require('bignumber.js');
 
 //CHANGE THIS
 NETWORK = "mainnet"
-AUTOMATED_RESERVE_ADDRESS = "0x7e2fd015616263add31a2acc2a437557cee80fc4"
-TOKEN_SYMBOL = "UPP"
-TOKEN_DECIMALS = 18
+AUTOMATED_RESERVE_ADDRESS = "0x3480E12B6C2438e02319e34b4c23770679169190"
+TOKEN_SYMBOL = "TKN"
+TOKEN_DECIMALS = 8
 
 const ETH_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 const NULL_ADDRESS = "0x0000000000000000000000000000000000000000";
+const MAX_RATE = 10 ** 24;
 
 const {addresses, wallets, web3} = connect(NETWORK);
 const kyber_reserve_ABI = config_abis.KyberReserve;
@@ -47,7 +48,7 @@ async function main() {
     tokenAddress, // conversionToken
     0, // currentBlockNumber
     false, // buy
-    srcQty, // srcQty
+    (10 ** TOKEN_DECIMALS).toString(), // srcQty
   ).call();
 
   stdLog('Checking sell rate in pricing contract...');
@@ -68,7 +69,7 @@ async function main() {
   rate = await reserveInstance.methods.getConversionRate(
     tokenAddress,
     ETH_ADDRESS,
-    srcQty, // srcQty
+    (10 ** TOKEN_DECIMALS).toString(), // srcQty
     0 // blockNumber
   ).call();
   stdLog('Checking sell rate in reserve contract...');
@@ -170,8 +171,13 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
       deltaEInFp = result.deltaEInFp;
     }
     maxEthCapSellInFp = await pricingInstance.methods.maxEthCapSellInFp().call();
-    if (deltaEInFp > maxEthCapSellInFp) {
+    deltaEInFp = new BN(deltaEInFp);
+    maxEthCapSellInFp = new BN(maxEthCapSellInFp);
+    if (deltaEInFp.isGreaterThan(maxEthCapSellInFp)) {
       stdLog(`Swap value too large, exceeds sell cap. Try smaller srcQty`,'error');
+      stdLog(`deltaEInFp: ${deltaEInFp}`);
+      stdLog(`max eth cap: ${maxEthCapSellInFp}`);
+      process.exit(0);
     }
   }
   stdLog(`Rate In Precision: ${rateInPrecision}`);
@@ -180,22 +186,29 @@ async function getRateWithDelta(delta,reserveBalance,isBuy) {
 
 async function validateRate(rateInPrecision,isBuy) {
   if (isBuy) {
-    minAllowRate = await pricingInstance.methods.minBuyRateInPrecision.call();
-    maxAllowRate = await pricingInstance.methods.maxBuyRateInPrecision.call();
+    minAllowRate = await pricingInstance.methods.minBuyRateInPrecision().call();
+    maxAllowRate = await pricingInstance.methods.maxBuyRateInPrecision().call();
   } else {
-    minAllowRate = await pricingInstance.methods.minSellRateInPrecision.call();
-    maxAllowRate = await pricingInstance.methods.maxSellRateInPrecision.call();
+    minAllowRate = await pricingInstance.methods.minSellRateInPrecision().call();
+    maxAllowRate = await pricingInstance.methods.maxSellRateInPrecision().call();
   }
 
-  if (rateInPrecision > maxAllowRate) {
+  minAllowRate = new BN(minAllowRate);
+  maxAllowRate = new BN(maxAllowRate);
+  rateInPrecision = new BN(rateInPrecision);
+
+  if (rateInPrecision.isGreaterThan(maxAllowRate)) {
     stdLog(`Rate in precision exceeds max allowed rate. Probably wrong settings, reset liquidity params.`,'error');
+    stdLog(`Rate in precision:${rateInPrecision}`);
+    stdLog(`Max allowed rate: ${maxAllowRate}`);
     process.exit(0);
-  } else if (rateInPrecision < minAllowRate) {
+  } else if (rateInPrecision.isLessThan(minAllowRate)) {
     stdLog(`Rate in precision below min allowed rate. Probably wrong settings, reset liquidity params.`,'error');
+    stdLog(`Rate in precision: ${rateInPrecision}`);
+    stdLog(`Min allow rate: ${minAllowRate}`);
     process.exit(0);
   }
-  maxRate = await pricingInstance.methods.MAX_RATE.call();
-  if (rateInPrecision > MAX_RATE) { stdLog(`Rate in precision exceeds 1M token per ETH. Price too small la.`,`error`)};
+  if (rateInPrecision > MAX_RATE) {stdLog(`Rate in precision exceeds 1M token per ETH. Price too small la.`,`error`)};
   process.exit(0);
 }
 
