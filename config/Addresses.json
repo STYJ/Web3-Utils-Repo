@@ -1,7 +1,7 @@
 {
   "kovan": {
     "FeeBurner": "0x0E49481279407295A2555b89D5e6C699b94621e0",
-    "KyberNetwork": "0x118A7b23B7a2e6A57963d017A7E76A4E2636F075",
+    "KyberNetwork": "0xb5034418f6cc1fd494535f2d38f770c9827f88a1",
     "KyberNetworkProxy": "0x692f391bCc85cefCe8C237C01e1f636BbD70EA4D",
     "PermissionlessOrderbookReserveLister": "0x7dE123798f649c9937A75a0f6668E4d06bFf5993",
     "SADMultisig": "0x0035Ee988c8a010D3c5e60FE538CAFC615127746"
@@ -25,7 +25,7 @@
 
   "ropsten": {
     "FeeBurner": "0x81ae4dE9A3Aec67a35C05c889052260E39BC42a4",
-    "KyberNetwork": "0x3f9a8e219ab1ad42f96b22c294e564b2b48fe636",
+    "KyberNetwork": "0x753fe1914db38ee744e071baadd123f50f9c8e46",
     "KyberNetworkProxy": "0x818E6FECD516Ecc3849DAf6845e3EC868087B755",
     "PermissionlessOrderbookReserveLister": "0x405a5fae110c86eb2e5a76809a17fc5bee2d3ccd",
     "SADMultisig": "0xb35a3e53599B77BaEe2331a47c87AA68DF798Ae8"
