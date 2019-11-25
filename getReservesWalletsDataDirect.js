@@ -173,7 +173,7 @@ async function fetchWalletData() {
 }
 
 function exportToJSON() {
-    fs.writeFile(OUTPUT_FILENAME, JSON.stringify(RESULT), function(err) {
+    fs.writeFile(OUTPUT_FILENAME, JSON.stringify(RESULT, null, 2), function(err) {
         if(err) console.log(err);
     });
 }
