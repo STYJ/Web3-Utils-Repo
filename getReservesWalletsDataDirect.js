@@ -88,7 +88,7 @@ async function getTokensOfReserve(reserve) {
     for (var i=0; i<pastListedPairs.length; i++) {
         listEvent = pastListedPairs[i];
         txHash = listEvent.transactionHash;
-        console.log(txHash);
+        // console.log(txHash);
         listEventValues = listEvent.returnValues;
         //ETH -> token events
         if (listEventValues.src.toLowerCase() === ethAddress) {
