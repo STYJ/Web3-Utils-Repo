@@ -5,10 +5,9 @@ require('dotenv').config();
 
 //CHANGE THESE SETTINGS
 const OUTPUT_FILENAME = "reservesWalletsStaging.json"
-const NETWORK = "mainnet" //"rinkeby"
-const START_BLOCK = 6996580 ; //staging
-//const START_BLOCK = 7003117; //mainnet
-//const START_BLOCK = 3953236; //rinkeby
+const NETWORK = "mainnet"
+// const START_BLOCK = 6996580 ; //staging
+const START_BLOCK = 7003117; //mainnet
 let CURRENT_BLOCK;
 
 //instantiate web3 instance
@@ -22,8 +21,8 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 const fee_burner_ABI = config_abis.FeeBurner;
 const kyber_network_ABI = config_abis.KyberNetwork;
 const orderbook_reserve_ABI = config_abis.OrderbookReserve;
-const fee_burner_address = config_addresses['staging'].FeeBurner;
-const kyber_network_address = config_addresses['staging'].KyberNetwork;
+const fee_burner_address = config_addresses[NETWORK].FeeBurner;
+const kyber_network_address = config_addresses[NETWORK].KyberNetwork;
 const ethAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let wrapFeeBurnerInstance;
 let feeBurnerInstance;
@@ -88,7 +87,7 @@ async function getTokensOfReserve(reserve) {
     for (var i=0; i<pastListedPairs.length; i++) {
         listEvent = pastListedPairs[i];
         txHash = listEvent.transactionHash;
-        console.log(txHash);
+        // console.log(txHash);
         listEventValues = listEvent.returnValues;
         //ETH -> token events
         if (listEventValues.src.toLowerCase() === ethAddress) {
