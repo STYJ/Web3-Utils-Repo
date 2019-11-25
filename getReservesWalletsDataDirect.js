@@ -1,19 +1,19 @@
 const fs = require('fs');
 const Web3 = require('web3');
 const fetch = require("node-fetch");
+const getPastEvents = require('./pastHelper.js').getPastEvents;
 require('dotenv').config();
 
 //CHANGE THESE SETTINGS
-const OUTPUT_FILENAME = "reservesWalletsStaging.json"
-const NETWORK = "mainnet" //"rinkeby"
-const START_BLOCK = 6996580 ; //staging
-//const START_BLOCK = 7003117; //mainnet
-//const START_BLOCK = 3953236; //rinkeby
+const OUTPUT_FILENAME = "reservesWalletsProduction.json"
+const NETWORK = "mainnet"
+//const START_BLOCK = 6996580 ; //staging
+const START_BLOCK = 7003117; //mainnet
 let CURRENT_BLOCK;
 
 //instantiate web3 instance
 const project_id = process.env.INFURA_PROJECT_ID;
-const infura_url = `wss://${NETWORK}.infura.io/ws/v3/${project_id}`;
+const infura_url = `wss://mainnet.infura.io/ws/v3/${project_id}`;
 const web3 = new Web3(new Web3.providers.WebsocketProvider(infura_url));
 
 //read config info
@@ -22,8 +22,8 @@ const config_addresses = JSON.parse(fs.readFileSync('./config/Addresses.json', '
 const fee_burner_ABI = config_abis.FeeBurner;
 const kyber_network_ABI = config_abis.KyberNetwork;
 const orderbook_reserve_ABI = config_abis.OrderbookReserve;
-const fee_burner_address = config_addresses['staging'].FeeBurner;
-const kyber_network_address = config_addresses['staging'].KyberNetwork;
+const fee_burner_address = config_addresses[NETWORK].FeeBurner;
+const kyber_network_address = config_addresses[NETWORK].KyberNetwork;
 const ethAddress = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 let wrapFeeBurnerInstance;
 let feeBurnerInstance;
@@ -155,13 +155,10 @@ async function getReserveFeeData(reserve) {
 }
 
 async function fetchWalletData() {
+    console.log("Fetching fee sharing wallet data...")
     walletFeeInfo = {};
 
-    allFeeWalletEvents = await feeBurnerInstance.getPastEvents('WalletFeesSet',{
-        fromBlock: 0,
-        toBlock: 'latest'
-    });
-
+    allFeeWalletEvents = await getPastEvents(web3,feeBurnerInstance,'WalletFeesSet',6000000,'latest',undefined,100000); 
     for (var i=0; i<allFeeWalletEvents.length; i++) {
         feeWalletEvent = allFeeWalletEvents[i].returnValues;
         walletFeeInfo[feeWalletEvent.wallet] = {
@@ -174,7 +171,7 @@ async function fetchWalletData() {
 }
 
 function exportToJSON() {
-    fs.writeFile(OUTPUT_FILENAME, JSON.stringify(RESULT), function(err) {
+    fs.writeFile(OUTPUT_FILENAME, JSON.stringify(RESULT, null, 2), function(err) {
         if(err) console.log(err);
     });
 }
